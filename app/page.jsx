@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../utils/firebase";
 import { motion } from "framer-motion";
-import Navbar from "./components/Navbar";
 import CourseCard from "./components/CourseCard";
 import Footer from "./components/Footer";
 

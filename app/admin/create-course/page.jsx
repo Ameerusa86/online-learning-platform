@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { firestore, collection, addDoc } from "../../../utils/firebase";
 import { useRouter } from "next/navigation";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 import { motion } from "framer-motion";
 
@@ -14,6 +15,7 @@ export default function CreateCourse() {
   const [technology, setTechnology] = useState("");
   const [videoURL, setVideoURL] = useState("");
   const [price, setPrice] = useState("");
+  const [image, setImage] = useState(null); // Add state for the image
   const [steps, setSteps] = useState([
     {
       title: "",
@@ -25,9 +27,18 @@ export default function CreateCourse() {
     },
   ]);
   const router = useRouter();
+  const storage = getStorage(); // Initialize Firebase Storage
 
   const handleCourseCreation = async (e) => {
     e.preventDefault();
+
+    let imageUrl = "";
+    if (image) {
+      const imageRef = ref(storage, `courses/${image.name}`);
+      const snapshot = await uploadBytes(imageRef, image);
+      imageUrl = await getDownloadURL(snapshot.ref);
+    }
+
     try {
       await addDoc(collection(firestore, "courses"), {
         title,
@@ -37,6 +48,7 @@ export default function CreateCourse() {
         videoURLs: [videoURL],
         price,
         steps,
+        imageUrl, // Save the image URL
       });
       router.push("/admin/dashboard");
     } catch (error) {
@@ -62,6 +74,12 @@ export default function CreateCourse() {
         price: "",
       },
     ]);
+  };
+
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
   };
 
   return (
@@ -145,6 +163,16 @@ export default function CreateCourse() {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="Course Price"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-700">
+              Project Image
+            </label>
+            <input
+              type="file"
+              onChange={handleImageChange}
               className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             />
           </div>
