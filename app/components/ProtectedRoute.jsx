@@ -11,7 +11,7 @@ export default function ProtectedRoute({ children }) {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (!user) {
-        router.push("/auth/login");
+        router.push("/auth");
       }
     });
 
