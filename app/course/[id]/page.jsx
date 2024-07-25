@@ -63,12 +63,17 @@ export default function CoursePage({ params }) {
     fetchProgress();
   }, [course]);
 
-  const updateProgress = async (stepIndex) => {
+  const toggleStepCompletion = async (stepIndex) => {
     const user = auth.currentUser;
     if (user && course) {
-      const newStepCompleted = { ...stepCompleted, [stepIndex]: true };
-      const newProgress =
-        (Object.keys(newStepCompleted).length / course.steps.length) * 100;
+      const newStepCompleted = { ...stepCompleted };
+      if (newStepCompleted[stepIndex]) {
+        delete newStepCompleted[stepIndex];
+      } else {
+        newStepCompleted[stepIndex] = true;
+      }
+      const completedSteps = Object.keys(newStepCompleted).length;
+      const newProgress = (completedSteps / course.steps.length) * 100;
       const docRef = doc(firestore, "users", user.uid, "courses", course.id);
       await setDoc(
         docRef,
@@ -161,15 +166,12 @@ export default function CoursePage({ params }) {
                 allowFullScreen
               ></iframe>
               <button
-                onClick={() => updateProgress(selectedStep)}
-                className={`mt-2 bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 ${
-                  stepCompleted[selectedStep]
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-                disabled={stepCompleted[selectedStep]}
+                onClick={() => toggleStepCompletion(selectedStep)}
+                className={`mt-2 bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50`}
               >
-                Mark as Completed
+                {stepCompleted[selectedStep]
+                  ? "Mark as Incomplete"
+                  : "Mark as Completed"}
               </button>
             </motion.div>
           )}
