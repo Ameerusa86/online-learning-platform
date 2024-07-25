@@ -10,8 +10,20 @@ import { motion } from "framer-motion";
 export default function CreateCourse() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [technology, setTechnology] = useState("");
+  const [videoURL, setVideoURL] = useState("");
   const [price, setPrice] = useState("");
-  const [videoURLs, setVideoURLs] = useState([""]);
+  const [steps, setSteps] = useState([
+    {
+      title: "",
+      description: "",
+      category: "",
+      technology: "",
+      videoURL: "",
+      price: "",
+    },
+  ]);
   const router = useRouter();
 
   const handleCourseCreation = async (e) => {
@@ -20,8 +32,11 @@ export default function CreateCourse() {
       await addDoc(collection(firestore, "courses"), {
         title,
         description,
+        category,
+        technology,
+        videoURLs: [videoURL],
         price,
-        videoURLs,
+        steps,
       });
       router.push("/admin/dashboard");
     } catch (error) {
@@ -29,14 +44,24 @@ export default function CreateCourse() {
     }
   };
 
-  const handleVideoURLChange = (index, value) => {
-    const newVideoURLs = [...videoURLs];
-    newVideoURLs[index] = value;
-    setVideoURLs(newVideoURLs);
+  const handleStepChange = (index, field, value) => {
+    const newSteps = [...steps];
+    newSteps[index][field] = value;
+    setSteps(newSteps);
   };
 
-  const addVideoURLField = () => {
-    setVideoURLs([...videoURLs, ""]);
+  const addStepField = () => {
+    setSteps([
+      ...steps,
+      {
+        title: "",
+        description: "",
+        category: "",
+        technology: "",
+        videoURL: "",
+        price: "",
+      },
+    ]);
   };
 
   return (
@@ -77,6 +102,42 @@ export default function CreateCourse() {
           </div>
           <div>
             <label className="block text-lg font-medium text-gray-700">
+              Course Category
+            </label>
+            <input
+              type="text"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              placeholder="Course Category"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-700">
+              Technology Used
+            </label>
+            <input
+              type="text"
+              value={technology}
+              onChange={(e) => setTechnology(e.target.value)}
+              placeholder="Technology Used"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-700">
+              YouTube Video URL
+            </label>
+            <input
+              type="text"
+              value={videoURL}
+              onChange={(e) => setVideoURL(e.target.value)}
+              placeholder="YouTube Video URL"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-700">
               Course Price
             </label>
             <input
@@ -88,25 +149,102 @@ export default function CreateCourse() {
             />
           </div>
           <div>
-            <label className="block text-lg font-medium text-gray-700">
-              YouTube Video URLs
-            </label>
-            {videoURLs.map((url, index) => (
-              <input
-                key={index}
-                type="text"
-                value={url}
-                onChange={(e) => handleVideoURLChange(index, e.target.value)}
-                placeholder="YouTube Video URL"
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 mb-2"
-              />
+            <h2 className="text-2xl font-bold mt-4 mb-2">Course Steps</h2>
+            {steps.map((step, index) => (
+              <div key={index} className="border p-4 rounded-md mb-4">
+                <h3 className="text-xl font-semibold mb-2">Step {index + 1}</h3>
+                <div>
+                  <label className="block text-lg font-medium text-gray-700">
+                    Step Title
+                  </label>
+                  <input
+                    type="text"
+                    value={step.title}
+                    onChange={(e) =>
+                      handleStepChange(index, "title", e.target.value)
+                    }
+                    placeholder="Step Title"
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium text-gray-700">
+                    Step Description
+                  </label>
+                  <textarea
+                    value={step.description}
+                    onChange={(e) =>
+                      handleStepChange(index, "description", e.target.value)
+                    }
+                    placeholder="Step Description"
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium text-gray-700">
+                    Step Category
+                  </label>
+                  <input
+                    type="text"
+                    value={step.category}
+                    onChange={(e) =>
+                      handleStepChange(index, "category", e.target.value)
+                    }
+                    placeholder="Step Category"
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium text-gray-700">
+                    Technology Used
+                  </label>
+                  <input
+                    type="text"
+                    value={step.technology}
+                    onChange={(e) =>
+                      handleStepChange(index, "technology", e.target.value)
+                    }
+                    placeholder="Technology Used"
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium text-gray-700">
+                    Step YouTube Video URL
+                  </label>
+                  <input
+                    type="text"
+                    value={step.videoURL}
+                    onChange={(e) =>
+                      handleStepChange(index, "videoURL", e.target.value)
+                    }
+                    placeholder="Step YouTube Video URL"
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-lg font-medium text-gray-700">
+                    Step Price
+                  </label>
+                  <input
+                    type="number"
+                    value={step.price}
+                    onChange={(e) =>
+                      handleStepChange(index, "price", e.target.value)
+                    }
+                    placeholder="Step Price"
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  />
+                </div>
+              </div>
             ))}
             <button
               type="button"
-              onClick={addVideoURLField}
+              onClick={addStepField}
               className="mt-2 bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             >
-              Add another video
+              Add another step
             </button>
           </div>
           <div className="text-center">

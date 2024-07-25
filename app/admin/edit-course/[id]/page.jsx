@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { auth, firestore, doc, getDoc, setDoc } from "../../../utils/firebase";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
-import { onAuthStateChanged } from "firebase/auth";
 import { motion } from "framer-motion";
 import { Spinner } from "@/app/components/Spinner";
 
@@ -15,6 +14,8 @@ export default function CoursePage({ params }) {
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stepCompleted, setStepCompleted] = useState({});
+  const [selectedStep, setSelectedStep] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -48,10 +49,13 @@ export default function CoursePage({ params }) {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setProgress(docSnap.data().progress);
+          const progressData = docSnap.data().progress;
+          setProgress(progressData);
+          setStepCompleted(docSnap.data().stepCompleted || {});
         } else {
-          await setDoc(docRef, { progress: 0 });
+          await setDoc(docRef, { progress: 0, stepCompleted: {} });
           setProgress(0);
+          setStepCompleted({});
         }
       }
     };
@@ -59,12 +63,20 @@ export default function CoursePage({ params }) {
     fetchProgress();
   }, [course]);
 
-  const updateProgress = async (newProgress) => {
+  const updateProgress = async (stepIndex) => {
     const user = auth.currentUser;
     if (user && course) {
+      const newStepCompleted = { ...stepCompleted, [stepIndex]: true };
+      const newProgress =
+        (Object.keys(newStepCompleted).length / course.steps.length) * 100;
       const docRef = doc(firestore, "users", user.uid, "courses", course.id);
-      await setDoc(docRef, { progress: newProgress }, { merge: true });
+      await setDoc(
+        docRef,
+        { progress: newProgress, stepCompleted: newStepCompleted },
+        { merge: true }
+      );
       setProgress(newProgress);
+      setStepCompleted(newStepCompleted);
     }
   };
 
@@ -90,58 +102,84 @@ export default function CoursePage({ params }) {
     return params.get("v") || pathname[pathname.length - 1];
   };
 
-  const videoIds = course.videoURLs
-    ? course.videoURLs.map((url) => extractVideoId(url))
+  const stepVideoIds = course.steps
+    ? course.steps.map((step) => extractVideoId(step.videoURL))
     : [];
-  const videoEmbedURLs = videoIds.map(
+  const stepVideoEmbedURLs = stepVideoIds.map(
     (id) => `https://www.youtube.com/embed/${id}`
   );
 
   return (
     <ProtectedRoute>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10"
-      >
-        <h1 className="text-3xl font-bold mb-4 text-center">{course.title}</h1>
-        <p className="text-lg mb-4">{course.description}</p>
-        {videoEmbedURLs.length > 0 ? (
-          videoEmbedURLs.map((url, index) => (
+      <div className="flex max-w-7xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
+        <div className="w-1/4 p-4 border-r">
+          <h2 className="text-xl font-semibold mb-4 text-black">
+            Course Steps
+          </h2>
+          {course.steps && course.steps.length > 0 && (
+            <ul>
+              {course.steps.map((step, index) => (
+                <li
+                  key={index}
+                  className={`mb-2 cursor-pointer p-2 rounded-md ${
+                    index === selectedStep
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-black"
+                  }`}
+                  onClick={() => setSelectedStep(index)}
+                >
+                  Step {index + 1}: {step.title}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="w-3/4 p-4">
+          <h1 className="text-3xl font-bold mb-4 text-center text-black">
+            {course.title}
+          </h1>
+          <p className="text-lg mb-4 text-black">{course.description}</p>
+          {course.steps && course.steps.length > 0 && (
             <motion.div
-              key={index}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               className="mb-4"
             >
-              <h2 className="text-xl font-semibold mb-2">Step {index + 1}</h2>
+              <h2 className="text-xl font-semibold mb-2 text-black">
+                Step {selectedStep + 1}: {course.steps[selectedStep].title}
+              </h2>
+              <p className="mb-2 text-black">
+                {course.steps[selectedStep].description}
+              </p>
               <iframe
                 width="100%"
                 height="400"
-                src={url}
+                src={stepVideoEmbedURLs[selectedStep]}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               ></iframe>
+              <button
+                onClick={() => updateProgress(selectedStep)}
+                className={`mt-2 bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 ${
+                  stepCompleted[selectedStep]
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+                disabled={stepCompleted[selectedStep]}
+              >
+                Mark as Completed
+              </button>
             </motion.div>
-          ))
-        ) : (
-          <p className="text-red-500 text-center mb-4">
-            Video URLs are not available.
-          </p>
-        )}
-        <div className="text-center">
-          <p className="text-xl mb-4">Progress: {progress}%</p>
-          <button
-            onClick={() => updateProgress(progress + 10)}
-            className="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
-          >
-            Increase Progress
-          </button>
+          )}
+          <div className="text-center mt-4">
+            <p className="text-xl text-black">
+              Progress: {progress.toFixed(2)}%
+            </p>
+          </div>
         </div>
-      </motion.div>
+      </div>
     </ProtectedRoute>
   );
 }

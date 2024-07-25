@@ -24,7 +24,6 @@ export default function HomePage() {
 
   return (
     <div>
-      <Navbar />
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
