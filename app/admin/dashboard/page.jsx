@@ -3,8 +3,6 @@
 
 import { useEffect, useState } from "react";
 import { firestore, collection, getDocs } from "../../../utils/firebase";
-import Navbar from "@/app/components/Navbar";
-import Footer from "@/app/components/Footer";
 
 export default function Dashboard() {
   const [courses, setCourses] = useState([]);
@@ -40,7 +38,6 @@ export default function Dashboard() {
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

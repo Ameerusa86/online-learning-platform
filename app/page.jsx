@@ -6,7 +6,6 @@ import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../utils/firebase";
 import { motion } from "framer-motion";
 import CourseCard from "./components/CourseCard";
-import Footer from "./components/Footer";
 
 export default function HomePage() {
   const [courses, setCourses] = useState([]);
@@ -60,7 +59,6 @@ export default function HomePage() {
           ))}
         </motion.div>
       </motion.main>
-      <Footer />
     </div>
   );
 }

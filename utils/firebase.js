@@ -10,7 +10,7 @@ import {
   collection,
   addDoc,
 } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, GithubAuthProvider } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -39,4 +39,6 @@ export {
   updateDoc,
   collection,
   addDoc,
+  GoogleAuthProvider,
+  GithubAuthProvider,
 };
