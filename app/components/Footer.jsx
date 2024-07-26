@@ -1,6 +1,5 @@
 "use client";
 
-// components/Footer.js
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa";
@@ -11,68 +10,58 @@ export default function Footer() {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1 }}
-      className="bg-gradient-to-r from-blue-700 to-blue-900 p-8 text-white fixed inset-x-0 bottom-0 shadow-lg"
+      className="bg-blue-800 py-4 text-center text-white"
     >
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="text-left mb-4 md:mb-0">
-            <h5 className="text-2xl font-bold">Online Learning Platform</h5>
-            <p className="text-gray-300">
+          <div className="text-left">
+            <h5 className="text-lg font-bold">Online Learning Platform</h5>
+            <p className="text-sm">
               &copy; {new Date().getFullYear()} All rights reserved.
             </p>
           </div>
-          <div className="flex space-x-6 mb-4 md:mb-0">
-            <Link href="/">
-              <motion.span
-                whileHover={{ scale: 1.1 }}
-                className="text-white hover:text-gray-300 transition duration-300"
-              >
-                Home
-              </motion.span>
+          <div className="flex space-x-4 mt-2 md:mt-0">
+            <Link
+              className="text-white hover:text-gray-300 transition duration-300"
+              href="/"
+            >
+              Home
             </Link>
-            <Link href="/courses">
-              <motion.span
-                whileHover={{ scale: 1.1 }}
-                className="text-white hover:text-gray-300 transition duration-300"
-              >
-                Courses
-              </motion.span>
+            <Link
+              className="text-white hover:text-gray-300 transition duration-300"
+              href="/courses"
+            >
+              Courses
             </Link>
-            <Link href="/about">
-              <motion.span
-                whileHover={{ scale: 1.1 }}
-                className="text-white hover:text-gray-300 transition duration-300"
-              >
-                About
-              </motion.span>
+            <Link
+              className="text-white hover:text-gray-300 transition duration-300"
+              href="/about"
+            >
+              About
             </Link>
-            <Link href="/contact">
-              <motion.span
-                whileHover={{ scale: 1.1 }}
-                className="text-white hover:text-gray-300 transition duration-300"
-              >
-                Contact
-              </motion.span>
+            <Link
+              className="text-white hover:text-gray-300 transition duration-300"
+              href="/contact"
+            >
+              Contact
             </Link>
           </div>
-        </div>
-        <div className="mt-4 flex justify-center space-x-6">
-          <Link href="https://www.linkedin.com">
-            <motion.span
-              whileHover={{ scale: 1.2 }}
-              className="text-white hover:text-gray-300 transition duration-300"
+          <div className="flex space-x-4 mt-2 md:mt-0">
+            <Link
+              className="text-white hover:text-gray-300 transition duration-300 flex items-center"
+              href="https://www.linkedin.com"
+              passHref
             >
-              <FaLinkedinIn size={24} />
-            </motion.span>
-          </Link>
-          <Link href="https://github.com/Ameerusa86">
-            <motion.span
-              whileHover={{ scale: 1.2 }}
-              className="text-white hover:text-gray-300 transition duration-300"
+              <FaLinkedinIn size={20} />
+            </Link>
+            <Link
+              className="text-white hover:text-gray-300 transition duration-300 flex items-center"
+              href="https://github.com/Ameerusa86"
+              passHref
             >
-              <FaGithub size={24} />
-            </motion.span>
-          </Link>
+              <FaGithub size={20} />
+            </Link>
+          </div>
         </div>
       </div>
     </motion.footer>

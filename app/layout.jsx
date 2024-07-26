@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./hooks/useAuth";
 
 const k2d = K2D({
   subsets: ["latin"],
@@ -18,13 +19,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={k2d.className}>
-        <div className="flex flex-col min-h-screen">
-          <Navbar />
-          <ProtectedRoute>
-            <main className="flex-grow mt-24">{children}</main>
-          </ProtectedRoute>
-          <Footer />
-        </div>
+        <AuthProvider>
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <ProtectedRoute>
+              <main className="flex-grow mt-24">{children}</main>
+            </ProtectedRoute>
+            <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
