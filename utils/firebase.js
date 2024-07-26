@@ -7,6 +7,7 @@ import {
   setDoc,
   getDocs,
   updateDoc,
+  deleteDoc,
   collection,
   addDoc,
 } from "firebase/firestore";
@@ -39,6 +40,7 @@ export {
   updateDoc,
   collection,
   addDoc,
+  deleteDoc,
   GoogleAuthProvider,
   GithubAuthProvider,
 };

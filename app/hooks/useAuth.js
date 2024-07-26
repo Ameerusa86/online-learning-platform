@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useContext, createContext } from "react";
+import { useEffect, useState, useContext, createContext } from "react";
 import { auth, firestore } from "@/utils/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { getDoc, setDoc, doc } from "firebase/firestore";
 
-const AuthContext = createContext();
+const AuthContext = createContext({ user: null, isLoading: true });
 
 export function AuthProvider({ children }) {
   const auth = useProvideAuth();
@@ -21,19 +20,24 @@ function useProvideAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userDoc = await getDoc(doc(firestore, "users", user.uid));
-        if (userDoc.exists()) {
-          setUser({ ...user, ...userDoc.data() });
-        } else {
-          setUser(user);
+        if (!userDoc.exists()) {
+          await setDoc(doc(firestore, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            isAdmin: false, // Default to non-admin
+            createdAt: new Date(),
+          });
         }
+        setUser(user);
       } else {
         setUser(null);
       }
       setIsLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 

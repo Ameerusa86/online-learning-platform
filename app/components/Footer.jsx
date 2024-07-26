@@ -51,6 +51,7 @@ export default function Footer() {
               className="text-white hover:text-gray-300 transition duration-300 flex items-center"
               href="https://www.linkedin.com"
               passHref
+              target="_blank"
             >
               <FaLinkedinIn size={20} />
             </Link>
@@ -58,6 +59,7 @@ export default function Footer() {
               className="text-white hover:text-gray-300 transition duration-300 flex items-center"
               href="https://github.com/Ameerusa86"
               passHref
+              target="_blank"
             >
               <FaGithub size={20} />
             </Link>
