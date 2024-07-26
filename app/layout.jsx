@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
         <div className="flex flex-col min-h-screen">
           <Navbar />
           <ProtectedRoute>
-            <main className="flex-grow">{children}</main>
+            <main className="flex-grow mt-24">{children}</main>
           </ProtectedRoute>
           <Footer />
         </div>

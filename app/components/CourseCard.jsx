@@ -29,6 +29,8 @@ export default function CourseCard({ course }) {
       </div>
       <div className="p-4">
         <p className="mb-2 text-gray-700">{course.description}</p>
+        <p className="mb-2 text-gray-700">Price: {course.price}</p>
+        <p className="mb-2 text-gray-700">{course.technology}</p>
         <Link
           className="inline-block mt-4 px-4 py-2 text-center bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
           href={`/course/${course.id}`}
