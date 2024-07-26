@@ -1,4 +1,3 @@
-// components/CourseCard.js
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -10,14 +9,20 @@ export default function CourseCard({ course }) {
       className="max-w-md p-4 bg-white rounded-lg shadow-lg overflow-hidden"
     >
       <div className="relative">
-        <Image
-          src={course.imageUrl}
-          alt="Course image"
-          className="w-full h-48 object-cover rounded-t-lg"
-          width={400}
-          height={200}
-          property="image"
-        />
+        {course.imageUrl ? (
+          <Image
+            src={course.imageUrl}
+            alt="Course image"
+            className="w-full h-48 object-cover rounded-t-lg"
+            width={400}
+            height={200}
+            property="image"
+          />
+        ) : (
+          <div className="w-full h-48 bg-gray-200 rounded-t-lg flex items-center justify-center">
+            <span className="text-gray-500">No Image Available</span>
+          </div>
+        )}
         <div className="absolute bottom-0 left-0 p-2 bg-gradient-to-t from-black to-transparent text-white w-full">
           <h2 className="text-xl font-bold">{course.title}</h2>
         </div>
