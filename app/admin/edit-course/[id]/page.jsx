@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { doc, firestore, getDoc, updateDoc } from "@/utils/firebase";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 import { Spinner } from "@/app/components/Spinner";
+import withAdminProtection from "../../dashboard/components/withAdminProtection";
 
-export default function EditCourse({ params }) {
+const EditCourse = ({ params }) => {
   const { id } = params;
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -221,4 +222,6 @@ export default function EditCourse({ params }) {
       </div>
     </ProtectedRoute>
   );
-}
+};
+
+export default withAdminProtection(EditCourse);

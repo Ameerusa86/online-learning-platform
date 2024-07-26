@@ -14,8 +14,9 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from "@/app/hooks/useAuth";
 import { motion } from "framer-motion";
 import Select from "react-select";
+import withAdminProtection from "@/app/admin/dashboard/components/withAdminProtection";
 
-export default function CreateCourse() {
+const CreateCourse = () => {
   const { user, isLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [title, setTitle] = useState("");
@@ -367,4 +368,6 @@ export default function CreateCourse() {
       </form>
     </motion.div>
   );
-}
+};
+
+export default withAdminProtection(CreateCourse);
