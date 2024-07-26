@@ -16,6 +16,7 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { FaGoogle, FaGithub } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function AuthPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -28,7 +29,6 @@ export default function AuthPage() {
   useEffect(() => {
     setIsMounted(true);
 
-    // Redirect to home if already logged in
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         router.push("/");
@@ -45,6 +45,7 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
+        toast.success("Logged in successfully!");
       } else {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
@@ -56,11 +57,12 @@ export default function AuthPage() {
           email: user.email,
           createdAt: new Date(),
         });
+        toast.success("Account created successfully!");
       }
       router.push("/");
     } catch (error) {
       console.error("Authentication Error:", error);
-      setError(
+      toast.error(
         "There was an issue with your login credentials. Please try again."
       );
     }
@@ -71,16 +73,17 @@ export default function AuthPage() {
     try {
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
-      if (userCredential.additionalUserInfo.isNewUser) {
+      if (userCredential.additionalUserInfo?.isNewUser) {
         await setDoc(doc(firestore, "users", user.uid), {
           email: user.email,
           createdAt: new Date(),
         });
       }
+      toast.success("Logged in with Google successfully!");
       router.push("/");
     } catch (error) {
       console.error("Google Login Error:", error);
-      setError("Google login failed. Please try again.");
+      toast.error("Google login failed. Please try again.");
     }
   };
 
@@ -89,12 +92,13 @@ export default function AuthPage() {
     try {
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
-      if (userCredential.additionalUserInfo.isNewUser) {
+      if (userCredential.additionalUserInfo?.isNewUser) {
         await setDoc(doc(firestore, "users", user.uid), {
           email: user.email,
           createdAt: new Date(),
         });
       }
+      toast.success("Logged in with GitHub successfully!");
       router.push("/");
     } catch (error) {
       if (error.code === "auth/account-exists-with-different-credential") {
@@ -105,7 +109,6 @@ export default function AuthPage() {
           if (
             methods.includes(EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD)
           ) {
-            // Prompt the user to sign in with the email/password method
             const password = prompt(
               "Please enter your password to link GitHub."
             );
@@ -113,48 +116,49 @@ export default function AuthPage() {
               .then((userCredential) => {
                 linkWithCredential(userCredential.user, pendingCred)
                   .then(() => {
+                    toast.success("Account linked successfully!");
                     router.push("/");
                   })
                   .catch((linkError) => {
                     console.error("Linking Error:", linkError);
-                    setError(
+                    toast.error(
                       "Linking GitHub to existing account failed. Please try again."
                     );
                   });
               })
               .catch((signInError) => {
                 console.error("Sign-in Error:", signInError);
-                setError("Sign-in failed. Please try again.");
+                toast.error("Sign-in failed. Please try again.");
               });
           } else if (methods.includes(GoogleAuthProvider.PROVIDER_ID)) {
-            // Sign in with Google and link the credentials
             const googleProvider = new GoogleAuthProvider();
             signInWithPopup(auth, googleProvider)
               .then((userCredential) => {
                 linkWithCredential(userCredential.user, pendingCred)
                   .then(() => {
+                    toast.success("Account linked successfully!");
                     router.push("/");
                   })
                   .catch((linkError) => {
                     console.error("Linking Error:", linkError);
-                    setError(
+                    toast.error(
                       "Linking GitHub to existing account failed. Please try again."
                     );
                   });
               })
               .catch((signInError) => {
                 console.error("Sign-in Error:", signInError);
-                setError("Sign-in failed. Please try again.");
+                toast.error("Sign-in failed. Please try again.");
               });
           } else {
-            setError(
+            toast.error(
               "An account already exists with a different credential. Please try a different login method."
             );
           }
         });
       } else {
         console.error("GitHub Login Error:", error);
-        setError("GitHub login failed. Please try again.");
+        toast.error("GitHub login failed. Please try again.");
       }
     }
   };
@@ -163,6 +167,7 @@ export default function AuthPage() {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
+      <Toaster />
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}

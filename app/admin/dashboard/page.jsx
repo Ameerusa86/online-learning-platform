@@ -1,66 +1,259 @@
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import {
+//   firestore,
+//   collection,
+//   getDocs,
+//   addDoc,
+//   deleteDoc,
+//   doc,
+// } from "@/utils/firebase";
+// import { useRouter } from "next/navigation";
+// import Link from "next/link";
+// import withAdminProtection from "./components/withAdminProtection.js";
+
+// const Dashboard = () => {
+//   const [courses, setCourses] = useState([]);
+//   const [categories, setCategories] = useState([]);
+//   const [technologies, setTechnologies] = useState([]);
+//   const [users, setUsers] = useState([]);
+//   const [newCategory, setNewCategory] = useState("");
+//   const [newTechnology, setNewTechnology] = useState("");
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const coursesSnapshot = await getDocs(collection(firestore, "courses"));
+//         setCourses(
+//           coursesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+//         );
+
+//         const categoriesSnapshot = await getDocs(
+//           collection(firestore, "categories")
+//         );
+//         setCategories(
+//           categoriesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+//         );
+
+//         const technologiesSnapshot = await getDocs(
+//           collection(firestore, "technologies")
+//         );
+//         setTechnologies(
+//           technologiesSnapshot.docs.map((doc) => ({
+//             id: doc.id,
+//             ...doc.data(),
+//           }))
+//         );
+
+//         const usersSnapshot = await getDocs(collection(firestore, "users"));
+//         setUsers(
+//           usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+//         );
+//       } catch (error) {
+//         console.error("Error fetching data:", error.message);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+
+//   const handleAddCategory = async () => {
+//     if (newCategory.trim() !== "") {
+//       try {
+//         const categoryRef = await addDoc(collection(firestore, "categories"), {
+//           name: newCategory,
+//         });
+//         setCategories([
+//           ...categories,
+//           { id: categoryRef.id, name: newCategory },
+//         ]);
+//         setNewCategory("");
+//       } catch (error) {
+//         console.error("Error adding category:", error.message);
+//       }
+//     }
+//   };
+
+//   const handleAddTechnology = async () => {
+//     if (newTechnology.trim() !== "") {
+//       try {
+//         const technologyRef = await addDoc(
+//           collection(firestore, "technologies"),
+//           {
+//             name: newTechnology,
+//           }
+//         );
+//         setTechnologies([
+//           ...technologies,
+//           { id: technologyRef.id, name: newTechnology },
+//         ]);
+//         setNewTechnology("");
+//       } catch (error) {
+//         console.error("Error adding technology:", error.message);
+//       }
+//     }
+//   };
+
+//   const handleDeleteCategory = async (id) => {
+//     try {
+//       await deleteDoc(doc(firestore, "categories", id));
+//       setCategories(categories.filter((category) => category.id !== id));
+//     } catch (error) {
+//       console.error("Error deleting category:", error.message);
+//     }
+//   };
+
+//   const handleDeleteTechnology = async (id) => {
+//     try {
+//       await deleteDoc(doc(firestore, "technologies", id));
+//       setTechnologies(
+//         technologies.filter((technology) => technology.id !== id)
+//       );
+//     } catch (error) {
+//       console.error("Error deleting technology:", error.message);
+//     }
+//   };
+
+//   return (
+//     <div className="container mx-auto px-4 py-8">
+//       <main className="p-4">
+//         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+//         <div className="mb-6">
+//           <p className="text-lg">Total Courses: {courses.length}</p>
+//           <div className="flex space-x-4 mt-4">
+//             <Link
+//               href="/admin/create-course"
+//               className="bg-blue-500 text-white px-4 py-2 rounded"
+//             >
+//               Create Course
+//             </Link>
+//           </div>
+//         </div>
+//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+//           {courses.map((course) => (
+//             <div
+//               key={course.id}
+//               className="border p-4 m-2 rounded-lg shadow-lg"
+//             >
+//               <h2 className="text-xl font-bold">{course.title}</h2>
+//               <p>{course.description}</p>
+//               <Link
+//                 href={`/admin/edit-course/${course.id}`}
+//                 className="text-blue-500 mt-2 block"
+//               >
+//                 Edit Course
+//               </Link>
+//             </div>
+//           ))}
+//         </div>
+//         <div className="mb-8">
+//           <h2 className="text-xl font-bold mb-4">Manage Categories</h2>
+//           <div className="flex mb-4">
+//             <input
+//               type="text"
+//               value={newCategory}
+//               onChange={(e) => setNewCategory(e.target.value)}
+//               placeholder="New Category"
+//               className="border p-2 rounded mr-2"
+//             />
+//             <button
+//               onClick={handleAddCategory}
+//               className="bg-green-500 text-white px-4 py-2 rounded"
+//             >
+//               Add Category
+//             </button>
+//           </div>
+//           <ul>
+//             {categories.map((category) => (
+//               <li
+//                 key={category.id}
+//                 className="flex justify-between items-center mb-2"
+//               >
+//                 {category.name}
+//                 <button
+//                   onClick={() => handleDeleteCategory(category.id)}
+//                   className="text-red-500"
+//                 >
+//                   Delete
+//                 </button>
+//               </li>
+//             ))}
+//           </ul>
+//         </div>
+//         <div className="mb-8">
+//           <h2 className="text-xl font-bold mb-4">Manage Technologies</h2>
+//           <div className="flex mb-4">
+//             <input
+//               type="text"
+//               value={newTechnology}
+//               onChange={(e) => setNewTechnology(e.target.value)}
+//               placeholder="New Technology"
+//               className="border p-2 rounded mr-2"
+//             />
+//             <button
+//               onClick={handleAddTechnology}
+//               className="bg-green-500 text-white px-4 py-2 rounded"
+//             >
+//               Add Technology
+//             </button>
+//           </div>
+//           <ul>
+//             {technologies.map((technology) => (
+//               <li
+//                 key={technology.id}
+//                 className="flex justify-between items-center mb-2"
+//               >
+//                 {technology.name}
+//                 <button
+//                   onClick={() => handleDeleteTechnology(technology.id)}
+//                   className="text-red-500"
+//                 >
+//                   Delete
+//                 </button>
+//               </li>
+//             ))}
+//           </ul>
+//         </div>
+//         <div className="mb-8">
+//           <h2 className="text-xl font-bold mb-4">Manage Users</h2>
+//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//             {users.map((user) => (
+//               <div key={user.id} className="border p-4 rounded-lg shadow-lg">
+//                 <h2 className="text-lg font-bold">{user.email}</h2>
+//                 <p>Admin: {user.isAdmin ? "Yes" : "No"}</p>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </main>
+//     </div>
+//   );
+// };
+
+// export default withAdminProtection(Dashboard);
+
+// pages/admin/dashboard.js
 "use client";
-
 import { useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import {
-  FaBook,
-  FaUser,
-  FaChevronLeft,
-  FaChevronRight,
-  FaTh,
-} from "react-icons/fa";
-
+import withAdminProtection from "./components/withAdminProtection";
+import Sidebar from "./components/Sidebar";
 import CoursesDashboard from "./components/CoursesDashboard";
 import UsersDashboard from "./components/UsersDashboard";
 
-export default function Dashboard() {
-  const [selectedSection, setSelectedSection] = useState("courses");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState("courses");
 
   return (
-    <div className="flex min-h-screen">
-      <motion.aside
-        initial={{ width: isSidebarOpen ? 240 : 64 }}
-        animate={{ width: isSidebarOpen ? 240 : 64 }}
-        transition={{ duration: 0.5 }}
-        className="bg-blue-800 text-white"
-      >
-        <div className="flex items-center justify-between p-4 border-b border-blue-600">
-          {isSidebarOpen ? (
-            <span className="text-xl font-bold">Dashboard</span>
-          ) : (
-            <FaTh size={24} />
-          )}
-          <button onClick={toggleSidebar}>
-            {isSidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
-          </button>
-        </div>
-        <nav className="p-4">
-          <button
-            onClick={() => setSelectedSection("courses")}
-            className="flex items-center w-full p-2 mb-2 text-left hover:bg-blue-700 rounded"
-          >
-            <FaBook className="mr-2" />
-            {isSidebarOpen && <span>Courses</span>}
-          </button>
-          <button
-            onClick={() => setSelectedSection("users")}
-            className="flex items-center w-full p-2 mb-2 text-left hover:bg-blue-700 rounded"
-          >
-            <FaUser className="mr-2" />
-            {isSidebarOpen && <span>Users</span>}
-          </button>
-        </nav>
-      </motion.aside>
-      <main className="flex-grow p-8">
-        {selectedSection === "courses" && <CoursesDashboard />}
-        {selectedSection === "users" && <UsersDashboard />}
-      </main>
+    <div className="flex h-screen">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="flex-1 p-4 overflow-y-auto">
+        {activeTab === "courses" && <CoursesDashboard />}
+        {activeTab === "users" && <UsersDashboard />}
+      </div>
     </div>
   );
-}
+};
+
+export default withAdminProtection(Dashboard);

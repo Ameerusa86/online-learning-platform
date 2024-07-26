@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./hooks/useAuth";
+import { Toaster } from "react-hot-toast";
 
 const k2d = K2D({
   subsets: ["latin"],
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={k2d.className}>
+        <Toaster />
         <AuthProvider>
           <div className="flex flex-col min-h-screen">
             <Navbar />
