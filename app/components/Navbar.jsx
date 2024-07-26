@@ -4,18 +4,26 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { auth } from "@/utils/firebase";
+import { auth, firestore } from "@/utils/firebase";
 import { FaBook, FaBars, FaTimes } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       setUser(user);
+      if (user) {
+        const userDoc = await getDoc(doc(firestore, "users", user.uid));
+        if (userDoc.exists()) {
+          setIsAdmin(userDoc.data().isAdmin);
+        }
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -69,6 +77,14 @@ export default function Navbar() {
           >
             Contact
           </Link>
+          {isAdmin && (
+            <Link
+              className="text-white hover:text-gray-300 transition duration-300"
+              href="/admin/dashboard"
+            >
+              Dashboard
+            </Link>
+          )}
         </div>
         <div className="hidden md:flex items-center space-x-4">
           {user ? (
@@ -144,6 +160,14 @@ export default function Navbar() {
             >
               Contact
             </Link>
+            {isAdmin && (
+              <Link
+                className="text-white hover:text-gray-300 transition duration-300"
+                href="/admin/dashboard"
+              >
+                Dashboard
+              </Link>
+            )}
             {user ? (
               <>
                 <Link href="/profile">
