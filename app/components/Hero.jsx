@@ -24,7 +24,7 @@ const HeroSection = () => {
           <div className="flex justify-center md:justify-start space-x-4">
             <Link
               href="/courses"
-              className="inline-block bg-pink-500 text-white py-3 px-6 rounded-md shadow hover:bg-pink-600 transition duration-300"
+              className="inline-block bg-green-500 text-white py-3 px-6 rounded-md shadow hover:bg-green-600 transition duration-300"
             >
               Explore Courses
             </Link>
@@ -43,7 +43,7 @@ const HeroSection = () => {
           className="flex-1 mt-10 md:mt-0 flex justify-center"
         >
           <Image
-            src="/images/girl2.png"
+            src="/images/girl3.png"
             alt="Hero Image"
             width={1200}
             height={1200}
