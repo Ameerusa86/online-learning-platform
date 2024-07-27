@@ -1,9 +1,9 @@
-// app/course/[id]/page.js
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { auth, firestore, doc, getDoc, setDoc } from "../../../utils/firebase";
+import { auth, firestore } from "../../../utils/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 import { motion } from "framer-motion";
 import { Spinner } from "@/app/components/Spinner"; // Ensure correct path
@@ -117,8 +117,8 @@ export default function CoursePage({ params }) {
   return (
     <ProtectedRoute>
       <div className="flex max-w-7xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
-        <div className="w-1/4 p-4 border-r">
-          <h2 className="text-xl font-semibold mb-4 text-black">
+        <div className="w-1/4 p-4 border-r border-gray-300">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
             Course Steps
           </h2>
           {course.steps && course.steps.length > 0 && (
@@ -129,7 +129,7 @@ export default function CoursePage({ params }) {
                   className={`mb-2 cursor-pointer p-2 rounded-md ${
                     index === selectedStep
                       ? "bg-blue-500 text-white"
-                      : "bg-gray-100 text-black"
+                      : "bg-gray-100 text-gray-800"
                   }`}
                   onClick={() => setSelectedStep(index)}
                 >
@@ -140,10 +140,10 @@ export default function CoursePage({ params }) {
           )}
         </div>
         <div className="w-3/4 p-4">
-          <h1 className="text-3xl font-bold mb-4 text-center text-black">
+          <h1 className="text-3xl font-bold mb-4 text-center text-gray-800">
             {course.title}
           </h1>
-          <p className="text-lg mb-4 text-black">{course.description}</p>
+          <p className="text-lg mb-4 text-gray-800">{course.description}</p>
           {course.steps && course.steps.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -151,10 +151,10 @@ export default function CoursePage({ params }) {
               transition={{ duration: 0.5 }}
               className="mb-4"
             >
-              <h2 className="text-xl font-semibold mb-2 text-black">
+              <h2 className="text-xl font-semibold mb-2 text-gray-800">
                 Step {selectedStep + 1}: {course.steps[selectedStep].title}
               </h2>
-              <p className="mb-2 text-black">
+              <p className="mb-2 text-gray-800">
                 {course.steps[selectedStep].description}
               </p>
               <iframe
@@ -176,7 +176,7 @@ export default function CoursePage({ params }) {
             </motion.div>
           )}
           <div className="text-center mt-4">
-            <p className="text-xl text-black">
+            <p className="text-xl text-gray-800">
               Progress: {progress.toFixed(2)}%
             </p>
           </div>

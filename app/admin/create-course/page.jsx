@@ -268,8 +268,10 @@ const CreateCourse = () => {
         <div className="px-4">
           <h2 className="text-2xl font-bold mt-4 mb-2">Course Steps</h2>
           {steps.map((step, index) => (
-            <div key={index} className="border p-4 rounded-md mb-4">
-              <h3 className="text-xl font-semibold mb-2">Step {index + 1}</h3>
+            <div key={index} className="border p-4 rounded-md mb-4 bg-gray-100">
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">
+                Step {index + 1}
+              </h3>
               <div>
                 <label className="block text-lg font-medium text-gray-700">
                   Step Title

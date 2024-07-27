@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const HeroSection = () => {
   return (
-    <section className="bg-cream-100 py-16 relative">
+    <section className="bg-100 py-16 relative">
       <div className="container mx-auto flex flex-col md:flex-row items-center">
         <motion.div
           initial={{ opacity: 0, x: -100 }}
@@ -15,7 +15,7 @@ const HeroSection = () => {
           className="flex-1 text-center md:text-left"
         >
           <h1 className="text-4xl md:text-6xl font-bold text-gray-800 leading-tight mb-4">
-            Learn <span className="text-green-500">Anything</span> Anytime
+            Learn <span className="text-teal-500">Anything</span> Anytime
           </h1>
           <p className="text-gray-600 mb-6">
             Discover the best courses for a variety of subjects, taught by
@@ -23,8 +23,8 @@ const HeroSection = () => {
           </p>
           <div className="flex justify-center md:justify-start space-x-4">
             <Link
+              className="inline-block bg-blue-500 text-white py-3 px-6 rounded-md shadow hover:bg-blue-600 transition duration-300"
               href="/courses"
-              className="inline-block bg-green-500 text-white py-3 px-6 rounded-md shadow hover:bg-green-600 transition duration-300"
             >
               Explore Courses
             </Link>

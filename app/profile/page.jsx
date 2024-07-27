@@ -1,11 +1,10 @@
-// app/profile/page.js
 "use client";
 
 import { useEffect, useState } from "react";
 import { auth, firestore, storage } from "../../utils/firebase";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { updateProfile, updatePassword } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, getDocs, collection } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import { motion } from "framer-motion";
 import { FaUserEdit, FaSave, FaUpload } from "react-icons/fa";
@@ -207,10 +206,10 @@ export default function ProfilePage() {
           </div>
         </form>
         <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-4 text-center">
+          <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
             Enrolled Courses
           </h2>
-          <ul className="list-disc pl-5">
+          <ul className="list-disc pl-5 text-gray-800">
             {courses.map((course, index) => (
               <li key={index} className="mb-2">
                 {course.title}

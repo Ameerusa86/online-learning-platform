@@ -90,7 +90,7 @@ const EditCourse = ({ params }) => {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
+      <div className="max-w-4xl mx-auto p-8 bg-200 shadow-lg rounded-lg mt-10">
         <h1 className="text-3xl font-bold mb-4 text-center">Edit Course</h1>
         <form onSubmit={handleUpdateCourse}>
           <div className="mb-4">

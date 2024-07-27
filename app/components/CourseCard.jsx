@@ -6,7 +6,7 @@ export default function CourseCard({ course }) {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className="max-w-md p-4 bg-white rounded-lg shadow-lg overflow-hidden"
+      className="max-w-md p-4 bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden"
     >
       <div className="relative">
         {course.imageUrl ? (
@@ -28,11 +28,11 @@ export default function CourseCard({ course }) {
         </div>
       </div>
       <div className="p-4">
-        <p className="mb-2 text-gray-700">{course.description}</p>
-        <p className="mb-2 text-gray-700">Price: {course.price}</p>
-        <p className="mb-2 text-gray-700">{course.technology}</p>
+        <p className="mb-2 text-gray-800">{course.description}</p>
+        <p className="mb-2 text-gray-800">Price: {course.price}</p>
+        <p className="mb-2 text-gray-800">{course.technology}</p>
         <Link
-          className="inline-block mt-4 px-4 py-2 text-center bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
+          className="inline-block mt-4 px-4 py-2 text-center bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
           href={`/course/${course.id}`}
         >
           Enroll Now

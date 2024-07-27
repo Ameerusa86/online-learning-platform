@@ -10,7 +10,7 @@ const Contact = () => {
   }, []);
 
   return (
-    <section className="py-20 bg-cream-100">
+    <section className="py-20 bg-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {isMounted && (
           <motion.div
@@ -18,12 +18,12 @@ const Contact = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-6">
+            <h2 className="text-4xl font-extrabold text-gray-800 mb-6">
               Contact Us
             </h2>
             <form className="space-y-4">
               <div>
-                <label className="block text-lg font-medium text-gray-700">
+                <label className="block text-lg font-medium text-gray-600">
                   Name
                 </label>
                 <input
@@ -33,7 +33,7 @@ const Contact = () => {
                 />
               </div>
               <div>
-                <label className="block text-lg font-medium text-gray-700">
+                <label className="block text-lg font-medium text-gray-600">
                   Email
                 </label>
                 <input
@@ -43,7 +43,7 @@ const Contact = () => {
                 />
               </div>
               <div>
-                <label className="block text-lg font-medium text-gray-700">
+                <label className="block text-lg font-medium text-gray-600">
                   Message
                 </label>
                 <textarea
@@ -54,7 +54,7 @@ const Contact = () => {
               </div>
               <button
                 type="submit"
-                className="inline-block bg-blue-800 text-white py-3 px-6 rounded-md shadow hover:bg-blue-900 transition duration-300"
+                className="inline-block bg-blue-500 text-white py-3 px-6 rounded-md shadow hover:bg-blue-600 transition duration-300"
               >
                 Send Message
               </button>
