@@ -102,6 +102,15 @@ const CoursesDashboard = () => {
     }
   };
 
+  const handleDeleteCourse = async (id) => {
+    try {
+      await deleteDoc(doc(firestore, "courses", id));
+      setCourses(courses.filter((course) => course.id !== id));
+    } catch (error) {
+      console.error("Error deleting course:", error.message);
+    }
+  };
+
   return (
     <div className="p-8 bg-white min-h-screen">
       <h1 className="text-2xl font-bold mb-4 text-gray-800">
@@ -126,12 +135,22 @@ const CoursesDashboard = () => {
           >
             <h2 className="text-xl font-bold text-gray-800">{course.title}</h2>
             <p className="text-gray-700">{course.description}</p>
-            <Link
-              href={`/admin/edit-course/${course.id}`}
-              className="text-blue-500 mt-2 block hover:text-blue-600 transition duration-300"
-            >
-              Edit Course
-            </Link>
+
+            <div className="flex align-middle justify-between">
+              {" "}
+              <Link
+                href={`/admin/edit-course/${course.id}`}
+                className="text-blue-500 mt-2 block hover:text-blue-600 transition duration-300"
+              >
+                Edit Course
+              </Link>
+              <button
+                onClick={() => handleDeleteCourse(course.id)}
+                className="text-red-500 mt-2 block hover:text-red-600 transition duration-300"
+              >
+                <FaTrash />
+              </button>
+            </div>
           </div>
         ))}
       </div>

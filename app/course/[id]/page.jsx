@@ -7,6 +7,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 import { motion } from "framer-motion";
 import { Spinner } from "@/app/components/Spinner"; // Ensure correct path
+import Link from "next/link"; // Ensure correct import
 
 export default function CoursePage({ params }) {
   const { id } = params;
@@ -16,6 +17,8 @@ export default function CoursePage({ params }) {
   const [error, setError] = useState(null);
   const [stepCompleted, setStepCompleted] = useState({});
   const [selectedStep, setSelectedStep] = useState(0);
+  const [user, setUser] = useState(null);
+  const [hasAccess, setHasAccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -43,19 +46,29 @@ export default function CoursePage({ params }) {
 
   useEffect(() => {
     const fetchProgress = async () => {
-      if (course && auth.currentUser) {
-        const user = auth.currentUser;
-        const docRef = doc(firestore, "users", user.uid, "courses", course.id);
+      const currentUser = auth.currentUser;
+      setUser(currentUser);
+
+      if (course && currentUser) {
+        const docRef = doc(
+          firestore,
+          "users",
+          currentUser.uid,
+          "courses",
+          course.id
+        );
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const progressData = docSnap.data().progress;
           setProgress(progressData);
           setStepCompleted(docSnap.data().stepCompleted || {});
+          setHasAccess(true);
         } else {
           await setDoc(docRef, { progress: 0, stepCompleted: {} });
           setProgress(0);
           setStepCompleted({});
+          setHasAccess(course.price === 0); // Grant access if course is free
         }
       }
     };
@@ -64,8 +77,13 @@ export default function CoursePage({ params }) {
   }, [course]);
 
   const toggleStepCompletion = async (stepIndex) => {
-    const user = auth.currentUser;
-    if (user && course) {
+    if (!hasAccess && stepIndex > 0) {
+      toast.error("Please purchase the course to access this content.");
+      return;
+    }
+
+    const currentUser = auth.currentUser;
+    if (currentUser && course) {
       const newStepCompleted = { ...stepCompleted };
       if (newStepCompleted[stepIndex]) {
         delete newStepCompleted[stepIndex];
@@ -74,7 +92,13 @@ export default function CoursePage({ params }) {
       }
       const completedSteps = Object.keys(newStepCompleted).length;
       const newProgress = (completedSteps / course.steps.length) * 100;
-      const docRef = doc(firestore, "users", user.uid, "courses", course.id);
+      const docRef = doc(
+        firestore,
+        "users",
+        currentUser.uid,
+        "courses",
+        course.id
+      );
       await setDoc(
         docRef,
         { progress: newProgress, stepCompleted: newStepCompleted },
@@ -157,14 +181,28 @@ export default function CoursePage({ params }) {
               <p className="mb-2 text-gray-800">
                 {course.steps[selectedStep].description}
               </p>
-              <iframe
-                width="100%"
-                height="400"
-                src={stepVideoEmbedURLs[selectedStep]}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+              {selectedStep === 0 || hasAccess ? (
+                <iframe
+                  width="100%"
+                  height="400"
+                  src={stepVideoEmbedURLs[selectedStep]}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              ) : (
+                <div className="bg-gray-100 p-6 text-center">
+                  <p className="text-gray-800 mb-4">
+                    Please purchase the course to access this content.
+                  </p>
+                  <Link
+                    className="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                    href={`/checkout/${course.id}`}
+                  >
+                    Purchase Course
+                  </Link>
+                </div>
+              )}
               <button
                 onClick={() => toggleStepCompletion(selectedStep)}
                 className={`mt-2 bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50`}
