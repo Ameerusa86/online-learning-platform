@@ -135,6 +135,7 @@ const CoursesDashboard = () => {
           >
             <h2 className="text-xl font-bold text-gray-800">{course.title}</h2>
             <p className="text-gray-700">{course.description}</p>
+            <p className="text-gray-700">Price: {course.price}</p>
 
             <div className="flex align-middle justify-between">
               {" "}

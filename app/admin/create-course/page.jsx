@@ -25,7 +25,7 @@ const CreateCourse = () => {
   const [categories, setCategories] = useState([]);
   const [technology, setTechnology] = useState([]);
   const [technologies, setTechnologies] = useState([]);
-  const [videoURL, setVideoURL] = useState("");
+  const [mainVideoURL, setMainVideoURL] = useState("");
   const [price, setPrice] = useState("");
   const [priceType, setPriceType] = useState("Free");
   const [image, setImage] = useState(null);
@@ -35,7 +35,7 @@ const CreateCourse = () => {
       description: "",
       category: "",
       technology: [],
-      videoURL: "",
+      stepVideoURL: "",
     },
   ]);
   const router = useRouter();
@@ -106,9 +106,12 @@ const CreateCourse = () => {
         description,
         category: category ? category.value : "",
         technology: technology.map((tech) => tech.value),
-        videoURLs: [videoURL],
+        mainVideoURL,
         price: priceType === "Free" ? "Free" : price,
-        steps,
+        steps: steps.map((step) => ({
+          ...step,
+          stepVideoURL: step.stepVideoURL,
+        })),
         imageUrl,
       });
       router.push("/admin/dashboard");
@@ -131,7 +134,7 @@ const CreateCourse = () => {
         description: "",
         category: "",
         technology: [],
-        videoURL: "",
+        stepVideoURL: "",
       },
     ]);
   };
@@ -208,13 +211,13 @@ const CreateCourse = () => {
           </div>
           <div className="w-full md:w-1/2 px-4">
             <label className="block text-lg font-medium text-gray-700">
-              YouTube Video URL
+              Main Video URL
             </label>
             <input
               type="text"
-              value={videoURL}
-              onChange={(e) => setVideoURL(e.target.value)}
-              placeholder="YouTube Video URL"
+              value={mainVideoURL}
+              onChange={(e) => setMainVideoURL(e.target.value)}
+              placeholder="Main Video URL"
               className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             />
           </div>
@@ -337,15 +340,15 @@ const CreateCourse = () => {
               </div>
               <div>
                 <label className="block text-lg font-medium text-gray-700">
-                  Step YouTube Video URL
+                  Step Video URL
                 </label>
                 <input
                   type="text"
-                  value={step.videoURL}
+                  value={step.stepVideoURL}
                   onChange={(e) =>
-                    handleStepChange(index, "videoURL", e.target.value)
+                    handleStepChange(index, "stepVideoURL", e.target.value)
                   }
-                  placeholder="Step YouTube Video URL"
+                  placeholder="Step Video URL"
                   className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 />
               </div>

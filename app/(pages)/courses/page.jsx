@@ -71,7 +71,7 @@ const CoursesPage = () => {
         (course) =>
           course.technology &&
           course.technology
-            .toLowerCase()
+            .map((tech) => tech.toLowerCase())
             .includes(technologyFilter.toLowerCase())
       );
     }

@@ -28,9 +28,19 @@ export default function CourseCard({ course }) {
         </div>
       </div>
       <div className="p-4">
-        <p className="mb-2 text-gray-800">{course.description}</p>
-        <p className="mb-2 text-gray-800">Price: {course.price}</p>
-        <p className="mb-2 text-gray-800">{course.technology}</p>
+        <p className="mb-2 text-gray-800">
+          <span className="font-bold">Desc: </span>
+          {course.description}
+        </p>
+        <p className="mb-2 text-gray-800">
+          <span className="font-bold">Price: </span>
+          {course.price === 0 ? "Free" : course.price}
+        </p>
+
+        <p className="mb-2 text-gray-800">
+          <span className="font-bold">Tech: </span>
+          {course.technology}
+        </p>
         <Link
           className="inline-block mt-4 px-4 py-2 text-center bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
           href={`/course/${course.id}`}

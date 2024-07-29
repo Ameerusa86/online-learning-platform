@@ -1,11 +1,18 @@
-// app/admin/edit-course/[id]/page.js
 "use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { doc, firestore, getDoc, updateDoc } from "@/utils/firebase";
+import {
+  doc,
+  collection,
+  getDoc,
+  getDocs,
+  updateDoc,
+  firestore,
+} from "@/utils/firebase";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 import { Spinner } from "@/app/components/Spinner";
+import Select from "react-select";
 import withAdminProtection from "../../dashboard/components/withAdminProtection";
 
 const EditCourse = ({ params }) => {
@@ -18,8 +25,13 @@ const EditCourse = ({ params }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [technology, setTechnology] = useState([]);
+  const [technologies, setTechnologies] = useState([]);
+  const [mainVideoURL, setMainVideoURL] = useState("");
   const [steps, setSteps] = useState([]);
+  const [isFree, setIsFree] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -29,12 +41,21 @@ const EditCourse = ({ params }) => {
 
         if (docSnap.exists()) {
           const courseData = { id: docSnap.id, ...docSnap.data() };
+          console.log("Fetched Course Data:", courseData); // Debugging line
           setCourse(courseData);
           setTitle(courseData.title);
           setDescription(courseData.description);
           setPrice(courseData.price);
-          setCategory(courseData.category);
+          setCategory({
+            label: courseData.category,
+            value: courseData.category,
+          });
+          setTechnology(
+            courseData.technology.map((tech) => ({ label: tech, value: tech }))
+          );
+          setMainVideoURL(courseData.mainVideoURL || ""); // Ensure mainVideoURL is fetched correctly
           setSteps(courseData.steps || []);
+          setIsFree(courseData.price === 0);
         } else {
           setError("Course not found");
         }
@@ -45,7 +66,30 @@ const EditCourse = ({ params }) => {
       }
     };
 
+    const fetchCategoriesAndTechnologies = async () => {
+      const categoriesSnapshot = await getDocs(
+        collection(firestore, "categories")
+      );
+      setCategories(
+        categoriesSnapshot.docs.map((doc) => ({
+          label: doc.data().name,
+          value: doc.data().name,
+        }))
+      );
+
+      const technologiesSnapshot = await getDocs(
+        collection(firestore, "technologies")
+      );
+      setTechnologies(
+        technologiesSnapshot.docs.map((doc) => ({
+          label: doc.data().name,
+          value: doc.data().name,
+        }))
+      );
+    };
+
     fetchCourse();
+    fetchCategoriesAndTechnologies();
   }, [id]);
 
   const handleUpdateCourse = async (e) => {
@@ -53,11 +97,23 @@ const EditCourse = ({ params }) => {
     try {
       const docRef = doc(firestore, "courses", id);
       await updateDoc(docRef, {
-        title,
-        description,
-        price,
-        category,
-        steps,
+        title: title || course.title,
+        description: description || course.description,
+        price: isFree ? 0 : price || course.price,
+        category: category ? category.value : course.category,
+        technology: technology.length
+          ? technology.map((tech) => tech.value)
+          : course.technology,
+        mainVideoURL: mainVideoURL || course.mainVideoURL,
+        steps: steps.length
+          ? steps.map((step) => ({
+              ...step,
+              stepVideoURL:
+                step.stepVideoURL ||
+                course.steps.find((s, i) => i === steps.indexOf(step))
+                  .stepVideoURL,
+            }))
+          : course.steps,
       });
       router.push("/admin/dashboard");
     } catch (error) {
@@ -72,7 +128,7 @@ const EditCourse = ({ params }) => {
   };
 
   const addStep = () => {
-    setSteps([...steps, { title: "", description: "", videoURL: "" }]);
+    setSteps([...steps, { title: "", description: "", stepVideoURL: "" }]);
   };
 
   const removeStep = (index) => {
@@ -90,11 +146,13 @@ const EditCourse = ({ params }) => {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-4xl mx-auto p-8 bg-200 shadow-lg rounded-lg mt-10">
-        <h1 className="text-3xl font-bold mb-4 text-center">Edit Course</h1>
+      <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
+        <h1 className="text-3xl font-bold mb-4 text-center text-gray-800">
+          Edit Course
+        </h1>
         <form onSubmit={handleUpdateCourse}>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-800 text-sm font-bold mb-2">
               Course Title
             </label>
             <input
@@ -103,11 +161,10 @@ const EditCourse = ({ params }) => {
               onChange={(e) => setTitle(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Course Title"
-              required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-800 text-sm font-bold mb-2">
               Description
             </label>
             <textarea
@@ -115,44 +172,88 @@ const EditCourse = ({ params }) => {
               onChange={(e) => setDescription(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Course Description"
-              required
             ></textarea>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-800 text-sm font-bold mb-2">
               Price
             </label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Course Price"
-              required
+            <div className="flex items-center mb-2">
+              <input
+                type="radio"
+                name="priceOption"
+                value="free"
+                checked={isFree}
+                onChange={() => setIsFree(true)}
+                className="mr-2"
+              />
+              <label className="mr-4">Free</label>
+              <input
+                type="radio"
+                name="priceOption"
+                value="custom"
+                checked={!isFree}
+                onChange={() => setIsFree(false)}
+                className="mr-2"
+              />
+              <label>Custom Price</label>
+            </div>
+            {!isFree && (
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Course Price"
+              />
+            )}
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-800 text-sm font-bold mb-2">
+              Category
+            </label>
+            <Select
+              value={category}
+              onChange={setCategory}
+              options={categories}
+              placeholder="Select Category"
+              className="mt-1"
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Category
+            <label className="block text-gray-800 text-sm font-bold mb-2">
+              Technologies Used
+            </label>
+            <Select
+              isMulti
+              value={technology}
+              onChange={setTechnology}
+              options={technologies}
+              placeholder="Select Technologies"
+              className="mt-1"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-800 text-sm font-bold mb-2">
+              Main Video URL
             </label>
             <input
               type="text"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              value={mainVideoURL}
+              onChange={(e) => setMainVideoURL(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Course Category"
-              required
+              placeholder="Main Video URL"
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
+            <label className="block text-gray-800 text-sm font-bold mb-2">
               Steps
             </label>
             {steps.map((step, index) => (
-              <div key={index} className="mb-4 p-4 border rounded">
+              <div key={index} className="mb-4 p-4 border rounded bg-gray-100">
                 <h3 className="text-lg font-semibold mb-2">Step {index + 1}</h3>
                 <div className="mb-2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                  <label className="block text-gray-800 text-sm font-bold mb-2">
                     Step Title
                   </label>
                   <input
@@ -163,11 +264,10 @@ const EditCourse = ({ params }) => {
                     }
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     placeholder="Step Title"
-                    required
                   />
                 </div>
                 <div className="mb-2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                  <label className="block text-gray-800 text-sm font-bold mb-2">
                     Description
                   </label>
                   <textarea
@@ -177,22 +277,20 @@ const EditCourse = ({ params }) => {
                     }
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     placeholder="Step Description"
-                    required
                   ></textarea>
                 </div>
                 <div className="mb-2">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Video URL
+                  <label className="block text-gray-800 text-sm font-bold mb-2">
+                    Step Video URL
                   </label>
                   <input
                     type="text"
-                    value={step.videoURL}
+                    value={step.stepVideoURL}
                     onChange={(e) =>
-                      handleStepChange(index, "videoURL", e.target.value)
+                      handleStepChange(index, "stepVideoURL", e.target.value)
                     }
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    placeholder="Video URL"
-                    required
+                    placeholder="Step Video URL"
                   />
                 </div>
                 <button
