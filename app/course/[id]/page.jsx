@@ -90,8 +90,10 @@ export default function CoursePage({ params }) {
       } else {
         newStepCompleted[stepIndex] = true;
       }
-      const completedSteps = Object.keys(newStepCompleted).length;
-      const newProgress = (completedSteps / (course.steps.length + 1)) * 100;
+      const completedSteps =
+        Object.keys(newStepCompleted).length - (newStepCompleted[0] ? 1 : 0);
+      const totalSteps = course.steps.length;
+      const newProgress = (completedSteps / totalSteps) * 100;
       const docRef = doc(
         firestore,
         "users",
@@ -150,7 +152,7 @@ export default function CoursePage({ params }) {
 
   return (
     <ProtectedRoute>
-      <div className="flex flex-col items-center max-w-7xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
+      <div className="flex flex-col items-center max-w-7xl mx-auto p-8 bg-gray-100 shadow-2xl rounded-lg mt-10">
         <h1 className="text-3xl font-bold mb-4 text-center text-gray-800">
           {course.title}
         </h1>
@@ -159,7 +161,10 @@ export default function CoursePage({ params }) {
         </p>
         <div className="flex w-full">
           <div className="w-1/4 p-4 border-r border-gray-300">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            <h2
+              className="text-xl font-semibold mb-4 text-white bg-blue-500 p-2 rounded-xl
+            shadow-md"
+            >
               Course Steps
             </h2>
             <ul>
@@ -209,14 +214,6 @@ export default function CoursePage({ params }) {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
-                <button
-                  onClick={() => toggleStepCompletion(0)}
-                  className={`mt-2 bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50`}
-                >
-                  {stepCompleted[0]
-                    ? "Mark as Incomplete"
-                    : "Mark as Completed"}
-                </button>
               </motion.div>
             ) : (
               course.steps &&
@@ -262,9 +259,9 @@ export default function CoursePage({ params }) {
             )}
           </div>
         </div>
-        <div className="text-center mt-4">
-          <p className="text-xl text-gray-800">
-            Progress: {progress.toFixed(2)}%
+        <div className="text-center mt-4 bg-blue-500 py-2 px-4 rounded-xl shadow-md ">
+          <p className="text-xl text-white">
+            Progress: {Math.floor(progress.toFixed(2))}%
           </p>
         </div>
       </div>
