@@ -2,12 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { auth, firestore } from "../../../utils/firebase";
+import { auth, firestore } from "@/utils/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 import { motion } from "framer-motion";
-import { Spinner } from "@/app/components/Spinner"; // Ensure correct path
-import Link from "next/link"; // Ensure correct import
+import { Spinner } from "@/app/components/Spinner";
 
 export default function CoursePage({ params }) {
   const { id } = params;

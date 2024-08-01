@@ -14,10 +14,6 @@ import { FaTrash } from "react-icons/fa";
 
 const CoursesDashboard = () => {
   const [courses, setCourses] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [technologies, setTechnologies] = useState([]);
-  const [newCategory, setNewCategory] = useState("");
-  const [newTechnology, setNewTechnology] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,23 +22,6 @@ const CoursesDashboard = () => {
         setCourses(
           coursesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         );
-
-        const categoriesSnapshot = await getDocs(
-          collection(firestore, "categories")
-        );
-        setCategories(
-          categoriesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        );
-
-        const technologiesSnapshot = await getDocs(
-          collection(firestore, "technologies")
-        );
-        setTechnologies(
-          technologiesSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
-        );
       } catch (error) {
         console.error("Error fetching data:", error.message);
       }
@@ -50,57 +29,6 @@ const CoursesDashboard = () => {
 
     fetchData();
   }, []);
-
-  const handleAddCategory = async () => {
-    if (newCategory.trim() !== "") {
-      try {
-        const docRef = await addDoc(collection(firestore, "categories"), {
-          name: newCategory,
-        });
-        setCategories([...categories, { id: docRef.id, name: newCategory }]);
-        setNewCategory("");
-      } catch (error) {
-        console.error("Error adding category:", error.message);
-      }
-    }
-  };
-
-  const handleAddTechnology = async () => {
-    if (newTechnology.trim() !== "") {
-      try {
-        const docRef = await addDoc(collection(firestore, "technologies"), {
-          name: newTechnology,
-        });
-        setTechnologies([
-          ...technologies,
-          { id: docRef.id, name: newTechnology },
-        ]);
-        setNewTechnology("");
-      } catch (error) {
-        console.error("Error adding technology:", error.message);
-      }
-    }
-  };
-
-  const handleDeleteCategory = async (id) => {
-    try {
-      await deleteDoc(doc(firestore, "categories", id));
-      setCategories(categories.filter((category) => category.id !== id));
-    } catch (error) {
-      console.error("Error deleting category:", error.message);
-    }
-  };
-
-  const handleDeleteTechnology = async (id) => {
-    try {
-      await deleteDoc(doc(firestore, "technologies", id));
-      setTechnologies(
-        technologies.filter((technology) => technology.id !== id)
-      );
-    } catch (error) {
-      console.error("Error deleting technology:", error.message);
-    }
-  };
 
   const handleDeleteCourse = async (id) => {
     try {
@@ -154,78 +82,6 @@ const CoursesDashboard = () => {
             </div>
           </div>
         ))}
-      </div>
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 text-gray-800">
-          Manage Categories
-        </h2>
-        <div className="flex mb-4">
-          <input
-            type="text"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            placeholder="New Category"
-            className="border p-2 rounded mr-2"
-          />
-          <button
-            onClick={handleAddCategory}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
-          >
-            Add Category
-          </button>
-        </div>
-        <ul>
-          {categories.map((category) => (
-            <li
-              key={category.id}
-              className="w-96 flex justify-between items-center mb-2 text-gray-800 hover:bg-gray-100 p-2 rounded"
-            >
-              <span>{category.name}</span>
-              <button
-                onClick={() => handleDeleteCategory(category.id)}
-                className="ml-2 text-red-500 hover:text-red-600 transition duration-300"
-              >
-                <FaTrash />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4 text-gray-800">
-          Manage Technologies
-        </h2>
-        <div className="flex mb-4">
-          <input
-            type="text"
-            value={newTechnology}
-            onChange={(e) => setNewTechnology(e.target.value)}
-            placeholder="New Technology"
-            className="border p-2 rounded mr-2"
-          />
-          <button
-            onClick={handleAddTechnology}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
-          >
-            Add Technology
-          </button>
-        </div>
-        <ul>
-          {technologies.map((technology) => (
-            <li
-              key={technology.id}
-              className="w-96 hover:bg-gray-100 p-2 rounded flex justify-between items-center mb-2 text-gray-800"
-            >
-              <span>{technology.name}</span>
-              <button
-                onClick={() => handleDeleteTechnology(technology.id)}
-                className="ml-2 text-red-500 hover:text-red-600 transition duration-300"
-              >
-                <FaTrash />
-              </button>
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );

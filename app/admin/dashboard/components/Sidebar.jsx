@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { FaBars, FaTimes, FaBook, FaUser } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { FaBars, FaTimes, FaBook, FaUser, FaCode } from "react-icons/fa";
+import { GiRadarSweep } from "react-icons/gi";
+import { TbCategoryFilled } from "react-icons/tb";
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -10,50 +11,72 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <motion.div
-      initial={{ width: isCollapsed ? 80 : 256 }}
-      animate={{ width: isCollapsed ? 80 : 256 }}
-      transition={{ duration: 0.3 }}
-      className="bg-blue-800 text-white h-screen p-4"
+    <div
+      className={`bg-blue-800 text-white p-4 ${
+        isCollapsed ? "w-20" : "w-64"
+      } transition-width duration-300`}
     >
       <div className="flex items-center justify-between">
-        <motion.h1
-          initial={{ opacity: isCollapsed ? 0 : 1 }}
-          animate={{ opacity: isCollapsed ? 0 : 1 }}
-          transition={{ duration: 0.3 }}
-          className="text-2xl font-bold text-white"
+        <h1
+          className={`${
+            isCollapsed ? "hidden" : "block"
+          } text-2xl font-bold text-white`}
         >
-          {!isCollapsed && "Dashboard"}
-        </motion.h1>
+          Dashboard
+        </h1>
         <button onClick={toggleCollapse} className="text-xl">
           {isCollapsed ? <FaBars /> : <FaTimes />}
         </button>
       </div>
       <ul className="mt-10">
-        <motion.li
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={`mb-4 cursor-pointer flex items-center p-2 rounded transition-colors duration-300 ${
-            activeTab === "courses" ? "bg-blue-600" : "hover:bg-blue-700"
+        <li
+          className={`mb-4 cursor-pointer ${
+            activeTab === "courses" && "bg-blue-600 p-2 rounded"
           }`}
           onClick={() => setActiveTab("courses")}
         >
           <FaBook className="inline mr-2" />
           {!isCollapsed && "Courses"}
-        </motion.li>
-        <motion.li
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={`mb-4 cursor-pointer flex items-center p-2 rounded transition-colors duration-300 ${
-            activeTab === "users" ? "bg-blue-600" : "hover:bg-blue-700"
+        </li>
+
+        <li
+          className={`mb-4 cursor-pointer ${
+            activeTab === "codingTutorials" && "bg-blue-600 p-2 rounded"
+          }`}
+          onClick={() => setActiveTab("codingTutorials")}
+        >
+          <FaCode className="inline mr-2" />
+          {!isCollapsed && "Coding Tutorials"}
+        </li>
+        <li
+          className={`mb-4 cursor-pointer ${
+            activeTab === "categories" && "bg-blue-600 p-2 rounded"
+          }`}
+          onClick={() => setActiveTab("categories")}
+        >
+          <TbCategoryFilled className="inline mr-2" />
+          {!isCollapsed && "Categories"}
+        </li>
+        <li
+          className={`mb-4 cursor-pointer ${
+            activeTab === "technologies" && "bg-blue-600 p-2 rounded"
+          }`}
+          onClick={() => setActiveTab("technologies")}
+        >
+          <GiRadarSweep className="inline mr-2" />
+          {!isCollapsed && "Technologies"}
+        </li>
+        <li
+          className={`mb-4 cursor-pointer ${
+            activeTab === "users" && "bg-blue-600 p-2 rounded"
           }`}
           onClick={() => setActiveTab("users")}
         >
           <FaUser className="inline mr-2" />
           {!isCollapsed && "Users"}
-        </motion.li>
+        </li>
       </ul>
-    </motion.div>
+    </div>
   );
 };
 
