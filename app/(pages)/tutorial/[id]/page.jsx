@@ -6,7 +6,7 @@ import { auth, firestore } from "@/utils/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 import { motion } from "framer-motion";
-import { Spinner } from "@/app/components/Spinner"; // Ensure correct path
+import { Spinner } from "@/app/components/Spinner";
 
 export default function TutorialDetailsPage({ params }) {
   const { id } = params;
@@ -21,7 +21,7 @@ export default function TutorialDetailsPage({ params }) {
   useEffect(() => {
     const fetchTutorial = async () => {
       try {
-        const docRef = doc(firestore, "codingTutorials", id);
+        const docRef = doc(firestore, "tutorials", id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
