@@ -11,9 +11,12 @@ import {
 } from "@/utils/firebase";
 import Link from "next/link";
 import { FaTrash } from "react-icons/fa";
+import DashboardCard from "./DashboardCard";
+import { useRouter } from "next/navigation";
 
 const CoursesDashboard = () => {
   const [courses, setCourses] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,6 +42,10 @@ const CoursesDashboard = () => {
     }
   };
 
+  const handleEditCourse = (course) => {
+    router.push(`/admin/edit-course/${course.id}`);
+  };
+
   return (
     <div className="p-8 bg-white min-h-screen">
       <h1 className="text-2xl font-bold mb-4 text-gray-800">
@@ -57,30 +64,12 @@ const CoursesDashboard = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {courses.map((course) => (
-          <div
+          <DashboardCard
             key={course.id}
-            className="border border-gray-300 p-4 m-2 rounded-lg shadow-lg bg-white"
-          >
-            <h2 className="text-xl font-bold text-gray-800">{course.title}</h2>
-            <p className="text-gray-700">{course.description}</p>
-            <p className="text-gray-700">Price: {course.price}</p>
-
-            <div className="flex align-middle justify-between">
-              {" "}
-              <Link
-                href={`/admin/edit-course/${course.id}`}
-                className="text-blue-500 mt-2 block hover:text-blue-600 transition duration-300"
-              >
-                Edit Course
-              </Link>
-              <button
-                onClick={() => handleDeleteCourse(course.id)}
-                className="text-red-500 mt-2 block hover:text-red-600 transition duration-300"
-              >
-                <FaTrash />
-              </button>
-            </div>
-          </div>
+            item={course}
+            onEdit={handleEditCourse}
+            onDelete={handleDeleteCourse}
+          />
         ))}
       </div>
     </div>

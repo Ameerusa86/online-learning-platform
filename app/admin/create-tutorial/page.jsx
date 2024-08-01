@@ -5,10 +5,10 @@ import {
   firestore,
   collection,
   addDoc,
-  doc,
   getDoc,
   getDocs,
-} from "../../../utils/firebase";
+  doc,
+} from "@/utils/firebase";
 import { useRouter } from "next/navigation";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from "@/app/hooks/useAuth";
@@ -18,7 +18,7 @@ import withAdminProtection from "@/app/admin/dashboard/components/withAdminProte
 import toast from "react-hot-toast";
 import { Spinner } from "@/app/components/Spinner";
 
-const CreateCourse = () => {
+const CreateTutorial = () => {
   const { user, isLoading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
   const [title, setTitle] = useState("");
@@ -27,17 +27,17 @@ const CreateCourse = () => {
   const [categories, setCategories] = useState([]);
   const [technology, setTechnology] = useState([]);
   const [technologies, setTechnologies] = useState([]);
-  const [mainVideoURL, setMainVideoURL] = useState("");
   const [price, setPrice] = useState("");
   const [priceType, setPriceType] = useState("Free");
   const [image, setImage] = useState(null);
+  const [mainVideoURL, setMainVideoURL] = useState("");
   const [steps, setSteps] = useState([
     {
       title: "",
       description: "",
       category: "",
       technology: [],
-      stepVideoURL: "",
+      codeSnippet: "",
     },
   ]);
   const router = useRouter();
@@ -87,38 +87,46 @@ const CreateCourse = () => {
     }
   }, [isLoading, user, router]);
 
-  const handleCourseCreation = async (e) => {
+  const handleTutorialCreation = async (e) => {
     e.preventDefault();
 
     if (!isAdmin) {
-      toast.error("You do not have permission to create a course.");
+      toast.error("You do not have permission to create a tutorial.");
       return;
     }
 
     let imageUrl = "";
     if (image) {
-      const imageRef = ref(storage, `courses/${image.name}`);
-      const snapshot = await uploadBytes(imageRef, image);
-      imageUrl = await getDownloadURL(snapshot.ref);
+      try {
+        const imageRef = ref(storage, `tutorials/${image.name}`);
+        const snapshot = await uploadBytes(imageRef, image);
+        imageUrl = await getDownloadURL(snapshot.ref);
+      } catch (error) {
+        console.error("Image Upload Error:", error);
+        toast.error(
+          "There was an issue uploading the image. Please try again."
+        );
+        return;
+      }
     }
 
     try {
-      await addDoc(collection(firestore, "courses"), {
+      await addDoc(collection(firestore, "tutorials"), {
         title,
         description,
         category: category ? category.value : "",
         technology: technology.map((tech) => tech.value),
         mainVideoURL,
         price: priceType === "Free" ? "Free" : price,
-        steps: steps.map((step) => ({
-          ...step,
-          stepVideoURL: step.stepVideoURL,
-        })),
+        steps: steps.map((step) => ({ ...step })),
         imageUrl,
       });
       router.push("/admin/dashboard");
     } catch (error) {
-      toast.error("An error occurred. Please try again.");
+      console.error("Firestore AddDoc Error:", error);
+      toast.error(
+        "There was an issue creating the tutorial. Please try again."
+      );
     }
   };
 
@@ -133,7 +141,10 @@ const CreateCourse = () => {
       ...steps,
       {
         title: "",
-        stepVideoURL: "",
+        description: "",
+        category: "",
+        technology: [],
+        codeSnippet: "",
       },
     ]);
   };
@@ -171,25 +182,25 @@ const CreateCourse = () => {
       className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10"
     >
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
-        Create a New Course
+        Create a New Tutorial
       </h1>
-      <form onSubmit={handleCourseCreation} className="space-y-6">
+      <form onSubmit={handleTutorialCreation} className="space-y-6">
         <div className="flex flex-wrap -mx-4">
           <div className="w-full md:w-1/2 px-4">
             <label className="block text-lg font-medium text-gray-700">
-              Course Title
+              Tutorial Title
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Course Title"
+              placeholder="Tutorial Title"
               className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             />
           </div>
           <div className="w-full md:w-1/2 px-4">
             <label className="block text-lg font-medium text-gray-700">
-              Course Category
+              Tutorial Category
             </label>
             <Select
               value={category}
@@ -226,7 +237,7 @@ const CreateCourse = () => {
           </div>
           <div className="w-full md:w-1/2 px-4">
             <label className="block text-lg font-medium text-gray-700">
-              Course Price
+              Tutorial Price
             </label>
             <Select
               value={{ label: priceType, value: priceType }}
@@ -261,7 +272,7 @@ const CreateCourse = () => {
         </div>
         <div className="px-4">
           <label className="block text-lg font-medium text-gray-700">
-            Course Description
+            Tutorial Description
           </label>
           <textarea
             value={description}
@@ -343,16 +354,16 @@ const CreateCourse = () => {
               </div>
               <div>
                 <label className="block text-lg font-medium text-gray-700">
-                  Step Video URL
+                  Step Code Snippet
                 </label>
-                <input
-                  type="text"
-                  value={step.stepVideoURL}
+                <textarea
+                  value={step.codeSnippet}
                   onChange={(e) =>
-                    handleStepChange(index, "stepVideoURL", e.target.value)
+                    handleStepChange(index, "codeSnippet", e.target.value)
                   }
-                  placeholder="Step Video URL"
+                  placeholder="Step Code Snippet"
                   className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  rows={4}
                 />
               </div>
             </div>
@@ -370,7 +381,7 @@ const CreateCourse = () => {
             type="submit"
             className="w-full bg-blue-500 text-white p-3 rounded-md shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
-            Create Course
+            Create Tutorial
           </button>
         </div>
       </form>
@@ -378,4 +389,4 @@ const CreateCourse = () => {
   );
 };
 
-export default withAdminProtection(CreateCourse);
+export default withAdminProtection(CreateTutorial);
