@@ -15,9 +15,9 @@ import { Spinner } from "@/app/components/Spinner";
 import Select from "react-select";
 import withAdminProtection from "../../dashboard/components/withAdminProtection";
 
-const EditCourse = ({ params }) => {
+const EditTutorial = ({ params }) => {
   const { id } = params;
-  const [course, setCourse] = useState(null);
+  const [tutorial, setTutorial] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
@@ -34,30 +34,33 @@ const EditCourse = ({ params }) => {
   const [isFree, setIsFree] = useState(false);
 
   useEffect(() => {
-    const fetchCourse = async () => {
+    const fetchTutorial = async () => {
       try {
-        const docRef = doc(firestore, "courses", id);
+        const docRef = doc(firestore, "tutorials", id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const courseData = { id: docSnap.id, ...docSnap.data() };
-          console.log("Fetched Course Data:", courseData); // Debugging line
-          setCourse(courseData);
-          setTitle(courseData.title);
-          setDescription(courseData.description);
-          setPrice(courseData.price);
+          const tutorialData = { id: docSnap.id, ...docSnap.data() };
+          console.log("Fetched Tutorial Data:", tutorialData);
+          setTutorial(tutorialData);
+          setTitle(tutorialData.title);
+          setDescription(tutorialData.description);
+          setPrice(tutorialData.price);
           setCategory({
-            label: courseData.category,
-            value: courseData.category,
+            label: tutorialData.category,
+            value: tutorialData.category,
           });
           setTechnology(
-            courseData.technology.map((tech) => ({ label: tech, value: tech }))
+            tutorialData.technology.map((tech) => ({
+              label: tech,
+              value: tech,
+            }))
           );
-          setMainVideoURL(courseData.mainVideoURL || "");
-          setSteps(courseData.steps || []);
-          setIsFree(courseData.price === 0);
+          setMainVideoURL(tutorialData.mainVideoURL || "");
+          setSteps(tutorialData.steps || []);
+          setIsFree(tutorialData.price === 0);
         } else {
-          setError("Course not found");
+          setError("Tutorial not found");
         }
         setLoading(false);
       } catch (err) {
@@ -88,32 +91,32 @@ const EditCourse = ({ params }) => {
       );
     };
 
-    fetchCourse();
+    fetchTutorial();
     fetchCategoriesAndTechnologies();
   }, [id]);
 
-  const handleUpdateCourse = async (e) => {
+  const handleUpdateTutorial = async (e) => {
     e.preventDefault();
     try {
-      const docRef = doc(firestore, "courses", id);
+      const docRef = doc(firestore, "tutorials", id);
       await updateDoc(docRef, {
-        title: title || course.title,
-        description: description || course.description,
-        price: isFree ? 0 : price || course.price,
-        category: category ? category.value : course.category,
+        title: title || tutorial.title,
+        description: description || tutorial.description,
+        price: isFree ? 0 : price || tutorial.price,
+        category: category ? category.value : tutorial.category,
         technology: technology.length
           ? technology.map((tech) => tech.value)
-          : course.technology,
-        mainVideoURL: mainVideoURL || course.mainVideoURL,
+          : tutorial.technology,
+        mainVideoURL: mainVideoURL || tutorial.mainVideoURL,
         steps: steps.length
           ? steps.map((step) => ({
               ...step,
-              stepVideoURL:
-                step.stepVideoURL ||
-                course.steps.find((s, i) => i === steps.indexOf(step))
-                  .stepVideoURL,
+              codeSnippet:
+                step.codeSnippet ||
+                tutorial.steps.find((s, i) => i === steps.indexOf(step))
+                  .codeSnippet,
             }))
-          : course.steps,
+          : tutorial.steps,
       });
       router.push("/admin/dashboard");
     } catch (error) {
@@ -128,7 +131,7 @@ const EditCourse = ({ params }) => {
   };
 
   const addStep = () => {
-    setSteps([...steps, { title: "", description: "", stepVideoURL: "" }]);
+    setSteps([...steps, { title: "", codeSnippet: "" }]);
   };
 
   const removeStep = (index) => {
@@ -148,19 +151,19 @@ const EditCourse = ({ params }) => {
     <ProtectedRoute>
       <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-lg mt-10">
         <h1 className="text-3xl font-bold mb-4 text-center text-gray-800">
-          Edit Course
+          Edit Tutorial
         </h1>
-        <form onSubmit={handleUpdateCourse}>
+        <form onSubmit={handleUpdateTutorial}>
           <div className="mb-4">
             <label className="block text-gray-800 text-sm font-bold mb-2">
-              Course Title
+              Tutorial Title
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Course Title"
+              placeholder="Tutorial Title"
             />
           </div>
           <div className="mb-4">
@@ -171,7 +174,7 @@ const EditCourse = ({ params }) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Course Description"
+              placeholder="Tutorial Description"
             ></textarea>
           </div>
           <div className="mb-4">
@@ -204,7 +207,7 @@ const EditCourse = ({ params }) => {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                placeholder="Course Price"
+                placeholder="Tutorial Price"
               />
             )}
           </div>
@@ -266,7 +269,7 @@ const EditCourse = ({ params }) => {
                     placeholder="Step Title"
                   />
                 </div>
-                <div className="mb-2">
+                {/* <div className="mb-2">
                   <label className="block text-gray-800 text-sm font-bold mb-2">
                     Description
                   </label>
@@ -278,8 +281,8 @@ const EditCourse = ({ params }) => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     placeholder="Step Description"
                   ></textarea>
-                </div>
-                <div className="mb-2">
+                </div> */}
+                {/* <div className="mb-2">
                   <label className="block text-gray-800 text-sm font-bold mb-2">
                     Step Video URL
                   </label>
@@ -292,6 +295,19 @@ const EditCourse = ({ params }) => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     placeholder="Step Video URL"
                   />
+                </div> */}
+                <div className="mb-2">
+                  <label className="block text-gray-800 text-sm font-bold mb-2">
+                    Code Snippet
+                  </label>
+                  <textarea
+                    value={step.codeSnippet}
+                    onChange={(e) =>
+                      handleStepChange(index, "codeSnippet", e.target.value)
+                    }
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    placeholder="Code Snippet"
+                  ></textarea>
                 </div>
                 <button
                   type="button"
@@ -314,7 +330,7 @@ const EditCourse = ({ params }) => {
             type="submit"
             className="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600 focus:outline-none"
           >
-            Update Course
+            Update Tutorial
           </button>
         </form>
       </div>
@@ -322,4 +338,4 @@ const EditCourse = ({ params }) => {
   );
 };
 
-export default withAdminProtection(EditCourse);
+export default withAdminProtection(EditTutorial);

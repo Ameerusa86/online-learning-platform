@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import CourseCard from "@/app/components/CourseCard";
 import TutorialCard from "@/app/components/TutorialCard";
+import { Spinner } from "@/app/components/Spinner";
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
@@ -17,7 +18,7 @@ const CoursesPage = () => {
       try {
         const coursesSnapshot = await getDocs(collection(firestore, "courses"));
         const tutorialsSnapshot = await getDocs(
-          collection(firestore, "codingTutorials")
+          collection(firestore, "tutorials")
         );
 
         setCourses(
@@ -39,7 +40,11 @@ const CoursesPage = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
   }
 
   return (

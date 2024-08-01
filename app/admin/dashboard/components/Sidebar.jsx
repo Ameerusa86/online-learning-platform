@@ -41,9 +41,9 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
         <li
           className={`mb-4 cursor-pointer ${
-            activeTab === "codingTutorials" && "bg-blue-600 p-2 rounded"
+            activeTab === "tutorials" && "bg-blue-600 p-2 rounded"
           }`}
-          onClick={() => setActiveTab("codingTutorials")}
+          onClick={() => setActiveTab("tutorials")}
         >
           <FaCode className="inline mr-2" />
           {!isCollapsed && "Coding Tutorials"}

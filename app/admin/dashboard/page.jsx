@@ -4,9 +4,9 @@ import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import CoursesDashboard from "./components/CoursesDashboard";
 import UsersDashboard from "./components/UsersDashboard";
-import CodingTutorialsDashboard from "./components/CodingTutorialsDashboard";
 import TechnologiesDashboard from "./components/TechnologiesDashboard";
 import CategoriesDashboard from "./components/CategoriesDashboard";
+import TutorialsDashboard from "./components/TutorialsDashboard";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("courses");
@@ -17,8 +17,8 @@ const Dashboard = () => {
         return <CoursesDashboard />;
       case "users":
         return <UsersDashboard />;
-      case "codingTutorials":
-        return <CodingTutorialsDashboard />;
+      case "tutorials":
+        return <TutorialsDashboard />;
       case "technologies":
         return <TechnologiesDashboard />;
       case "categories":
