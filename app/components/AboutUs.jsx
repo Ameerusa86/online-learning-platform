@@ -10,12 +10,15 @@ const AboutUs = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          <h2 className="text-4xl font-extrabold text-white mb-6">About Us</h2>
+          <h2 className="text-4xl font-extrabold text-white mb-6">About Me</h2>
           <p className="text-lg text-white">
-            We are a leading online learning platform providing high-quality
-            courses across various fields. Our mission is to make education
-            accessible and affordable for everyone. Our courses are taught by
-            industry experts and designed to help you achieve your career goals.
+            I'm a software developer with a passion for teaching. I have over 3
+            years of experience in web development and have worked with a
+            variety of technologies including React, Node.js, Angular and
+            Firebase along side with other technologies on the web development
+            side, Databases like Mongo DB & SQL, Python with RPA Automation and
+            Data Processing. I'm excited to share my knowledge with you and help
+            you learn new skills.
           </p>
         </motion.div>
       </div>

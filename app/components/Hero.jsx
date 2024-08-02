@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const HeroSection = () => {
   return (
-    <section className="bg-100 py-16 relative">
+    <section className="bg-100 relative">
       <div className="container mx-auto flex flex-col md:flex-row items-center">
         <motion.div
           initial={{ opacity: 0, x: -100 }}
