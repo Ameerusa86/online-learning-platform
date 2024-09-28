@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { auth, firestore } from "@/utils/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
-import { Spinner } from "@/app/components/Spinner";
+import Spinner2 from "@/components/spinner2";
 
 export default function TutorialDetailsPage({ params }) {
   const { id } = params;
@@ -90,7 +90,7 @@ export default function TutorialDetailsPage({ params }) {
   };
 
   if (loading) {
-    return <Spinner />;
+    return <Spinner2 />;
   }
 
   if (error) {
