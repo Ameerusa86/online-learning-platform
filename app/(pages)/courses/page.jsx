@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import { firestore, collection, getDocs } from "@/utils/firebase";
 import { motion } from "framer-motion";
-import Link from "next/link";
-import CourseCard from "@/app/components/CourseCard";
-import TutorialCard from "@/app/components/TutorialCard";
-import { Spinner } from "@/app/components/Spinner";
+import CourseCard from "@/components/Cards/CourseCard";
+import Spinner from "@/components/spinner";
 
 const CoursesPage = () => {
   const [courses, setCourses] = useState([]);
@@ -70,7 +68,7 @@ const CoursesPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <TutorialCard tutorial={tutorial} />
+            {/* <TutorialCard tutorial={tutorial} /> */}
           </motion.div>
         ))}
       </div>
