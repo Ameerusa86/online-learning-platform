@@ -13,6 +13,14 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import React from "react";
 import DashboardLayout from "../../../DashboardLayout";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // Define the Course type
 interface Course {
@@ -24,6 +32,8 @@ interface Course {
 
 const CoursesDashboard: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null); // Store selected course for deletion
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Control modal state
   const router = useRouter();
 
   // Fetch courses from Firestore
@@ -48,15 +58,31 @@ const CoursesDashboard: React.FC = () => {
   }, []);
 
   // Delete course
-  const handleDeleteCourse = async (id: string) => {
-    try {
-      await deleteDoc(doc(firestore, "courses", id));
-      setCourses((prevCourses) =>
-        prevCourses.filter((course) => course.id !== id)
-      );
-    } catch (error) {
-      console.error("Error deleting course:", (error as Error).message);
+  const handleDeleteCourse = async () => {
+    if (selectedCourse) {
+      try {
+        await deleteDoc(doc(firestore, "courses", selectedCourse.id));
+        setCourses((prevCourses) =>
+          prevCourses.filter((course) => course.id !== selectedCourse.id)
+        );
+        setIsDialogOpen(false); // Close the modal after deletion
+        setSelectedCourse(null); // Reset the selected course
+      } catch (error) {
+        console.error("Error deleting course:", (error as Error).message);
+      }
     }
+  };
+
+  // Open modal to confirm deletion
+  const openDeleteModal = (course: Course) => {
+    setSelectedCourse(course); // Set the course to delete
+    setIsDialogOpen(true); // Open the dialog
+  };
+
+  // Close the modal without deleting
+  const closeDeleteModal = () => {
+    setIsDialogOpen(false);
+    setSelectedCourse(null); // Clear selected course
   };
 
   // Edit course
@@ -109,7 +135,7 @@ const CoursesDashboard: React.FC = () => {
                     <FaEdit />
                   </button>
                   <button
-                    onClick={() => handleDeleteCourse(course.id)}
+                    onClick={() => openDeleteModal(course)}
                     className="text-red-500 hover:text-red-600"
                   >
                     <FaTrash />
@@ -119,6 +145,27 @@ const CoursesDashboard: React.FC = () => {
             ))}
           </tbody>
         </table>
+
+        {/* Shadcn Modal */}
+        {selectedCourse && (
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+              <DialogTitle>Confirm Deletion</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete the course "
+                {selectedCourse.title}"? This action cannot be undone.
+              </DialogDescription>
+              <DialogFooter>
+                <Button variant="ghost" onClick={closeDeleteModal}>
+                  No, Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteCourse}>
+                  Yes, Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </DashboardLayout>
   );
