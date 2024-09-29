@@ -9,6 +9,7 @@ import Select, { SingleValue } from "react-select"; // Import SingleValue for ty
 import toast from "react-hot-toast";
 import React from "react";
 import DashboardLayout from "../../../DashboardLayout";
+import { useAuth } from "@/app/hooks/useAuth";
 
 // Type definitions
 interface Category {
@@ -46,6 +47,7 @@ const CreateCourse: React.FC = () => {
   ]);
   const router = useRouter();
   const storage = getStorage();
+  const user = useAuth();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -89,9 +91,9 @@ const CreateCourse: React.FC = () => {
           stepVideoURL: step.stepVideoURL,
         })),
         imageUrl,
-        author: "Anonymous", // Use the logged-in user's name
+        author: user?.name || "Anonymous",
       });
-      router.push("/admin/dashboard");
+      router.push("/admin/dashboard/courses");
     } catch (error) {
       toast.error("An error occurred. Please try again.");
     }

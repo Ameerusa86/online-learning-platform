@@ -3,25 +3,17 @@
 import React, { useState } from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useRouter } from "next/navigation"; // Use router to redirect after logout
+import { useAuth } from "@/app/hooks/useAuth";
+import { images } from "@/public/images";
 
 export const AccountToggle = () => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter(); // Use router for navigation
+  const user = useAuth(); // Get user from useAuth hook
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
-
-  // const handleLogout = async () => {
-  //   await signOut({ redirect: false }); // Use signOut without auto redirect
-  //   router.push("/"); // Redirect to the main page after logout
-  // };
-
-  // Fallback values if no session exists
-  // const userName = session?.user?.name || "Guest User";
-  // const userEmail = session?.user?.email || "guest@domain.com";
-  // const userImage =
-  //   session?.user?.image || "https://api.dicebear.com/9.x/notionists/svg"; // Default avatar if no user image
 
   return (
     <div className="border-b mb-4 mt-2 pb-4 border-stone-300">
@@ -31,15 +23,20 @@ export const AccountToggle = () => {
         aria-expanded={isOpen}
       >
         <img
-          src={"userImage"}
+          src={
+            user?.photoURL ||
+            (typeof images.defaultUser === "string"
+              ? images.defaultUser
+              : images.defaultUser.src)
+          }
           alt="avatar"
-          className="w-10 h-10 rounded-full shrink-0 bg-violet-500 shadow-lg"
+          className="w-10 h-10 rounded-full shrink-0 object-cover bg-violet-500 shadow-lg"
         />
         <div className="flex-1 flex flex-col text-start">
           <span className="text-base font-semibold block text-stone-800">
-            {"userName"}
+            {user?.name || "User"}
           </span>
-          <span className="text-sm block text-stone-500">{"userEmail"}</span>
+          <span className="text-sm block text-stone-500">{user?.email}</span>
         </div>
 
         {isOpen ? (

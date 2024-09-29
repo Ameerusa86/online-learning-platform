@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 import {
   createUserWithEmailAndPassword,
+  updateProfile,
   GoogleAuthProvider,
 } from "firebase/auth"; // Firebase method for user registration
 import { addDoc, collection } from "firebase/firestore"; // Ensure you're using the correct Firestore imports
@@ -19,6 +20,7 @@ import SocialAuth from "./SocialAuth";
 
 // Validation schema for the form
 interface RegisterFormInputs {
+  fullName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -38,7 +40,7 @@ const RegisterComponent = () => {
 
   // Handle form submission and register the user
   const handleRegister = async (data: RegisterFormInputs) => {
-    const { email, password } = data;
+    const { fullName, email, password } = data;
     try {
       // Create user with Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(
@@ -48,12 +50,18 @@ const RegisterComponent = () => {
       );
       const user = userCredential.user;
 
+      // Use updateProfile function to set displayName
+      await updateProfile(user, {
+        displayName: fullName, // Set the display name to the full name
+      });
+
       // Add user data to Firestore
       const usersRef = collection(firestore, "users");
       await addDoc(usersRef, {
         uid: user.uid,
+        fullName: fullName, // Store fullName from form input
         email: user.email,
-        name: user.displayName || "", // Use empty string if displayName is null
+        name: fullName, // Save the fullName as the 'name'
         photoURL: user.photoURL || "", // Use empty string if photoURL is null
       });
 
@@ -124,6 +132,27 @@ const RegisterComponent = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
+            {/* Full Name Input */}
+            <div>
+              <Label htmlFor="fullName" className="text-white block mb-2">
+                Full Name
+              </Label>
+              <input
+                type="text"
+                id="fullName"
+                className="py-3 px-4 bg-input-dark text-white rounded-md focus:outline-none shadow-md w-full"
+                placeholder="Enter your full name"
+                {...register("fullName", {
+                  required: "Full name is required",
+                })}
+              />
+              {errors.fullName && (
+                <span className="text-red-500 text-sm">
+                  {errors.fullName.message}
+                </span>
+              )}
+            </div>
+
             {/* Email Input */}
             <div>
               <Label htmlFor="email" className="text-white block mb-2">

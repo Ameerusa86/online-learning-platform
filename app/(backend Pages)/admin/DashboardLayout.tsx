@@ -8,7 +8,7 @@ export default function DefaultLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100  mt-28">
       <div className="sm:flex sm:justify-center mx-auto">
         <Sidebar />
         {/* Main content */}
