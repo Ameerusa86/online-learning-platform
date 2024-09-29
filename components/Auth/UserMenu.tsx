@@ -32,9 +32,9 @@ const UserMenu = () => {
         {user ? (
           <Image
             src={user.photoURL || images.defaultUser}
-            height={50}
-            width={50}
-            className="hidden md:block rounded-full cursor-pointer border-2 border-teal-500 hover:border-teal-700 transition-all"
+            height={75}
+            width={75}
+            className="hidden md:block rounded-full cursor-pointer border-2 border-teal-500 hover:border-teal-700 transition-all object-cover w-12 h-12"
             alt="Profile Image"
           />
         ) : (

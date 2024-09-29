@@ -46,16 +46,6 @@ const Navbar: React.FC = () => {
           {user ? (
             <UserMenu />
           ) : (
-            // <Link href="/profile" className="flex items-center space-x-2">
-            //   <Image
-            //     src={images.defaultUser || user.photoURL} // You can fetch the user's photoURL from Firebase, or use a default placeholder image.
-            //     alt="Profile Image"
-            //     width={40}
-            //     height={40}
-            //     className="rounded-full"
-            //   />
-            // </Link>
-
             <Button
               variant="outline"
               className="border-teal-400 text-teal-400 hover:bg-teal-400 hover:text-white transition"

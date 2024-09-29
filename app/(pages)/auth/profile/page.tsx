@@ -20,6 +20,8 @@ import { motion } from "framer-motion";
 import { FaSave, FaUpload } from "react-icons/fa";
 import User from "@/types/User";
 import { useToast } from "@/hooks/use-toast";
+import React from "react";
+import Image from "next/image";
 
 // Define component state types
 interface ProfileState {
@@ -201,11 +203,15 @@ export default function ProfilePage() {
 
         <div className="mb-6 flex flex-col items-center">
           {user && (
-            <img
-              src={user.photoURL || "/default-profile.png"}
-              alt="Profile"
-              className="w-24 h-24 rounded-full mb-4"
-            />
+            <div className="relative w-24 h-24 rounded-full overflow-hidden">
+              <Image
+                src={user.photoURL || "/default-profile.png"}
+                alt="Profile"
+                className="object-cover w-full h-full"
+                width={96}
+                height={96}
+              />
+            </div>
           )}
           <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center space-x-2">
             <FaUpload />
