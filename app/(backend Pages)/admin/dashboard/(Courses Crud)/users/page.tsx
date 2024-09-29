@@ -6,8 +6,8 @@ import {
   collection,
   getDocs,
   doc,
-  deleteDoc,
   setDoc,
+  deleteDoc,
   updateDoc,
 } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -16,6 +16,15 @@ import React from "react";
 import DashboardLayout from "../../../DashboardLayout";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 // Define the User type
 interface User {
@@ -35,6 +44,9 @@ const Users: React.FC = () => {
   const [editUserFullName, setEditUserFullName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [loading, setLoading] = useState(true); // Add loading state
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Control modal state
+  const [selectedUser, setSelectedUser] = useState<User | null>(null); // Store selected user for deletion
+  const { toast } = useToast();
 
   // Fetch users from Firestore
   useEffect(() => {
@@ -61,7 +73,11 @@ const Users: React.FC = () => {
   // Add new user with Firebase authentication and Firestore entry
   const handleAddUser = async () => {
     if (!newUserEmail || !newUserPassword || !newUserFullName) {
-      setErrorMessage("Please fill in all fields.");
+      toast({
+        title: "Error",
+        description: "Please fill in all fields.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -75,7 +91,7 @@ const Users: React.FC = () => {
 
       await setDoc(doc(firestore, "users", user.uid), {
         email: newUserEmail,
-        fullName: newUserFullName,
+        name: newUserFullName,
         isAdmin: false,
         createdAt: new Date(),
       });
@@ -94,13 +110,26 @@ const Users: React.FC = () => {
       setNewUserEmail("");
       setNewUserPassword("");
       setNewUserFullName("");
-      setErrorMessage(""); // Clear error message on success
+
+      toast({
+        title: "Success",
+        description: `User ${newUserFullName} was created successfully.`,
+      });
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
-        setErrorMessage("The email address is already in use.");
+        // Show a toast for email already in use
+        toast({
+          title: "Error",
+          description: "The email address is already in use.",
+          variant: "destructive",
+        });
       } else {
         console.error("Error adding user:", error.message);
-        setErrorMessage("Error adding user.");
+        toast({
+          title: "Error",
+          description: "Failed to create the user.",
+          variant: "destructive",
+        });
       }
     }
   };
@@ -115,34 +144,70 @@ const Users: React.FC = () => {
       try {
         const userDocRef = doc(firestore, "users", editingUser.id);
         await updateDoc(userDocRef, {
-          fullName: editUserFullName,
+          name: editUserFullName,
           email: editUserEmail,
         });
 
         setUsers((prev) =>
           prev.map((user) =>
             user.id === editingUser.id
-              ? { ...user, fullName: editUserFullName, email: editUserEmail }
+              ? { ...user, name: editUserFullName, email: editUserEmail }
               : user
           )
         );
         setEditingUser(null);
         setEditUserEmail("");
         setEditUserFullName("");
+
+        toast({
+          title: "Success",
+          description: "User details updated successfully.",
+        });
       } catch (error) {
         console.error("Error editing user:", (error as Error).message);
+        toast({
+          title: "Error",
+          description: "Failed to update user details.",
+          variant: "destructive",
+        });
       }
     }
   };
 
   // Delete user from Firestore
-  const handleDeleteUser = async (userId: string) => {
-    try {
-      await deleteDoc(doc(firestore, "users", userId));
-      setUsers(users.filter((user) => user.id !== userId));
-    } catch (error) {
-      console.error("Error deleting user:", (error as Error).message);
+  const handleDeleteUser = async () => {
+    if (selectedUser) {
+      try {
+        await deleteDoc(doc(firestore, "users", selectedUser.id));
+        setUsers(users.filter((user) => user.id !== selectedUser.id));
+        setIsDialogOpen(false);
+        setSelectedUser(null);
+
+        toast({
+          title: "Success",
+          description: `User ${selectedUser.name} was deleted successfully.`,
+        });
+      } catch (error) {
+        console.error("Error deleting user:", (error as Error).message);
+        toast({
+          title: "Error",
+          description: "Failed to delete user.",
+          variant: "destructive",
+        });
+      }
     }
+  };
+
+  // Open modal to confirm deletion
+  const openDeleteModal = (user: User) => {
+    setSelectedUser(user); // Set the user to delete
+    setIsDialogOpen(true); // Open the dialog
+  };
+
+  // Close the modal without deleting
+  const closeDeleteModal = () => {
+    setIsDialogOpen(false);
+    setSelectedUser(null); // Clear selected user
   };
 
   // Start editing
@@ -163,8 +228,18 @@ const Users: React.FC = () => {
           user.id === userId ? { ...user, isAdmin: !isAdmin } : user
         )
       );
+
+      toast({
+        title: "Success",
+        description: `User ${isAdmin ? "demoted" : "promoted"} successfully.`,
+      });
     } catch (error) {
       console.error("Error toggling admin status:", (error as Error).message);
+      toast({
+        title: "Error",
+        description: "Failed to change user admin status.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -269,7 +344,7 @@ const Users: React.FC = () => {
                       <FaEdit />
                     </button>
                     <button
-                      onClick={() => handleDeleteUser(user.id)}
+                      onClick={() => openDeleteModal(user)}
                       className="text-red-500 hover:text-red-600 mr-2"
                     >
                       <FaTrash />
@@ -293,6 +368,27 @@ const Users: React.FC = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Shadcn Modal for Delete Confirmation */}
+          {selectedUser && (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete the User "{selectedUser.name}
+                  "? This action cannot be undone.
+                </DialogDescription>
+                <DialogFooter>
+                  <Button variant="ghost" onClick={closeDeleteModal}>
+                    No, Cancel
+                  </Button>
+                  <Button variant="destructive" onClick={handleDeleteUser}>
+                    Yes, Delete
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
     </DashboardLayout>

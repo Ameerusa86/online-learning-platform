@@ -13,6 +13,14 @@ import {
 import { FaTrash, FaEdit } from "react-icons/fa";
 import React from "react";
 import DashboardLayout from "../../../DashboardLayout";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 // Define the Category type
 interface Category {
@@ -25,6 +33,10 @@ const Categories: React.FC = () => {
   const [newCategory, setNewCategory] = useState<string>("");
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editCategoryName, setEditCategoryName] = useState<string>("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
 
   // Fetch data on component load
   useEffect(() => {
@@ -89,13 +101,31 @@ const Categories: React.FC = () => {
   };
 
   // Delete category
-  const handleDeleteCategory = async (id: string) => {
-    try {
-      await deleteDoc(doc(firestore, "categories", id));
-      setCategories((prev) => prev.filter((category) => category.id !== id));
-    } catch (error) {
-      console.error("Error deleting category:", (error as Error).message);
+  const handleDeleteCategory = async () => {
+    if (selectedCategory) {
+      try {
+        await deleteDoc(doc(firestore, "categories", selectedCategory.id));
+        setCategories((prev) =>
+          prev.filter((category) => category.id !== selectedCategory.id)
+        );
+        setIsDialogOpen(false);
+        setSelectedCategory(null);
+      } catch (error) {
+        console.error("Error deleting category:", (error as Error).message);
+      }
     }
+  };
+
+  // Open modal to confirm deletion
+  const openDeleteModal = (category: Category) => {
+    setSelectedCategory(category); // Set the course to delete
+    setIsDialogOpen(true); // Open the dialog
+  };
+
+  // Close the modal without deleting
+  const closeDeleteModal = () => {
+    setIsDialogOpen(false);
+    setSelectedCategory(null); // Clear selected course
   };
 
   const handleStartEditing = (category: Category) => {
@@ -174,7 +204,7 @@ const Categories: React.FC = () => {
                       <FaEdit />
                     </button>
                     <button
-                      onClick={() => handleDeleteCategory(category.id)}
+                      onClick={() => openDeleteModal(category)}
                       className="text-red-500 hover:text-red-600"
                     >
                       <FaTrash />
@@ -184,6 +214,26 @@ const Categories: React.FC = () => {
               ))}
             </tbody>
           </table>
+          {/* Shadcn Modal */}
+          {selectedCategory && (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete the category? "
+                  {selectedCategory.name}"? This action cannot be undone.
+                </DialogDescription>
+                <DialogFooter>
+                  <Button variant="ghost" onClick={closeDeleteModal}>
+                    No, Cancel
+                  </Button>
+                  <Button variant="destructive" onClick={handleDeleteCategory}>
+                    Yes, Delete
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
     </DashboardLayout>
