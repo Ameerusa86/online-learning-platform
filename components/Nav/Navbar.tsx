@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
         </nav>
 
         {/* Auth Section */}
-        <div className="hidden md:flex items-center space-x-4 relative">
+        <div className="hidden lg:flex items-center space-x-4 relative">
           {user ? (
             <UserMenu />
           ) : (

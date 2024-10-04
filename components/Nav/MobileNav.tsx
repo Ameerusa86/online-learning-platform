@@ -7,9 +7,16 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
 import Image from "next/image";
+import { useAuth } from "@/app/hooks/useAuth";
+import { images } from "@/public/images";
+import { Button } from "../ui/button";
+import { signOut } from "firebase/auth";
+import { auth } from "@/utils/firebase";
+import UserMenu from "../Auth/UserMenu";
 
 const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const user = useAuth();
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -66,13 +73,15 @@ const MobileNav = () => {
               <div className="md:block hidden">
                 <Image
                   className="rounded-full mx-auto border-4 border-teal-400"
-                  src={""}
+                  src={user?.photoURL || images.defaultUser}
                   width={85}
                   height={85}
                   alt="Profile"
                 />
-                <h1 className="block text-center py-4 text-2xl">"User Name"</h1>
-                <p className="block text-center py-4 text-lg">"Email"</p>
+                <h1 className="block text-center py-4 text-2xl">
+                  {user?.name}
+                </h1>
+                <p className="block text-center py-4 text-lg">{user?.email}</p>
               </div>
               {Navlinks.map((link, index) => (
                 <Link
@@ -107,7 +116,21 @@ const MobileNav = () => {
                   </motion.h1>
                 </Link>
               )} */}
-              <div className="mx-auto">sign out</div>
+              {!user ? (
+                <Button className="block mx-auto">
+                  <Link href={"/auth/signin"}>Login</Link>
+                </Button>
+              ) : (
+                <Button
+                  className="block mx-auto"
+                  variant="secondary"
+                  onClick={() => {
+                    signOut(auth);
+                  }}
+                >
+                  Sign out
+                </Button>
+              )}
             </motion.div>
           </>
         )}

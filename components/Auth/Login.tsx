@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { Label } from "@radix-ui/react-label";
 import { useAuth } from "@/app/hooks/useAuth";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 // Validation schema for the form
 interface LoginFormInputs {
@@ -19,6 +20,7 @@ interface LoginFormInputs {
 }
 
 const LoginComponent = () => {
+  const { toast } = useToast();
   const router = useRouter();
   const user = useAuth();
   const {
@@ -39,8 +41,22 @@ const LoginComponent = () => {
           router.push("/");
         }
       );
-    } catch (error) {
-      console.error("Failed to login:", error);
+    } catch (error: any) {
+      if (error.code === "auth/email-already-in-use") {
+        // Show a toast for email already in use
+        toast({
+          title: "Error",
+          description: "The email address is already in use.",
+          variant: "destructive",
+        });
+      } else {
+        console.error("Error adding user:", error.message);
+        toast({
+          title: "Error",
+          description: "User not found. Please check your credentials.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
