@@ -1,3 +1,6 @@
+"use client";
+
+import { useAuth } from "@/app/hooks/useAuth";
 import React from "react";
 import { FiCalendar } from "react-icons/fi";
 
@@ -13,6 +16,7 @@ const formatDate = (date: Date) => {
 };
 
 export const TopBar = () => {
+  const user = useAuth(); // Get the authenticated user
   const today = new Date(); // Get today's date
   const formattedDate = formatDate(today); // Format the date
 
@@ -20,7 +24,7 @@ export const TopBar = () => {
     <div className="border-b px-4 mb-4 mt-2 pb-4 border-stone-200">
       <div className="flex items-center justify-between p-0.5">
         <div>
-          <span className="text-sm font-bold block">🚀 Good morning, Tom!</span>
+          <span className="text-lg font-bold block">Hello, {user?.name}</span>
           <span className="text-xs block text-stone-500">{formattedDate}</span>
         </div>
 

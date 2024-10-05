@@ -118,7 +118,7 @@ const CoursesDashboard: React.FC = () => {
               <th className="px-4 py-2">Course Title</th>
               <th className="px-4 py-2">Author</th>
               <th className="px-4 py-2">Price</th>
-              <th className="px-4 py-2 text-right">Actions</th>
+              <th className="px-4 py-2 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -126,8 +126,13 @@ const CoursesDashboard: React.FC = () => {
               <tr key={course.id} className="hover:bg-gray-100">
                 <td className="border px-4 py-2">{course.title}</td>
                 <td className="border px-4 py-2">{course.author}</td>
-                <td className="border px-4 py-2">${course.price}</td>
-                <td className="border px-4 py-2 text-right">
+                {course.price === 0 ? (
+                  <td className="border px-4 py-2">Free</td>
+                ) : (
+                  <td className="border px-4 py-2">${course.price}</td>
+                )}
+
+                <td className="border px-4 py-2 text-center">
                   <button
                     onClick={() => handleEditCourse(course)}
                     className="text-yellow-500 hover:text-yellow-600 mr-2"
