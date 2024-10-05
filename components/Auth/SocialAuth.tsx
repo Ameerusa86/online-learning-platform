@@ -28,6 +28,7 @@ const SocialAuth: React.FC = () => {
         name: firebaseUser.displayName,
         email: firebaseUser.email,
         photoURL: firebaseUser.photoURL,
+        isAdmin: false,
       };
 
       // Set the user state and save to Firestore
@@ -59,6 +60,7 @@ const SocialAuth: React.FC = () => {
         name: firebaseUser.displayName,
         email: firebaseUser.email,
         photoURL: firebaseUser.photoURL,
+        isAdmin: false,
       };
 
       // Set the user state and save to Firestore
