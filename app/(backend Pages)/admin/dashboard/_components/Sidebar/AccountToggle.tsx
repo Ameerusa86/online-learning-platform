@@ -5,6 +5,10 @@ import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useRouter } from "next/navigation"; // Use router to redirect after logout
 import { useAuth } from "@/app/hooks/useAuth";
 import { images } from "@/public/images";
+import { signOut } from "firebase/auth";
+import { auth } from "@/utils/firebase";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const AccountToggle = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,10 +37,10 @@ export const AccountToggle = () => {
           className="w-10 h-10 rounded-full shrink-0 object-cover bg-violet-500 shadow-lg"
         />
         <div className="flex-1 flex flex-col text-start">
-          <span className="text-base font-semibold block text-stone-800">
+          <span className="text-sm font-semibold block text-stone-800">
             {user?.name || "User"}
           </span>
-          <span className="text-sm block text-stone-500">{user?.email}</span>
+          {/* <span className="text-xs block text-stone-500">{user?.email}</span> */}
         </div>
 
         {isOpen ? (
@@ -57,15 +61,27 @@ export const AccountToggle = () => {
               <li className="text-sm text-stone-700 hover:bg-stone-100 p-2 rounded transition-all cursor-pointer">
                 Account Settings
               </li>
-              <li className="text-sm text-stone-700 hover:bg-stone-100 p-2 rounded transition-all cursor-pointer">
-                Profile
-              </li>
-              <li
+              <Link
+                href={"/auth/profile"}
                 className="text-sm text-stone-700 hover:bg-stone-100 p-2 rounded transition-all cursor-pointer"
-                onClick={() => {}} // Attach logout function to button
               >
-                Logout
-              </li>
+                Profile
+              </Link>
+              {!user ? (
+                <Button className="block mx-auto">
+                  <Link href={"/auth/signin"}>Login</Link>
+                </Button>
+              ) : (
+                <Button
+                  className="block mx-auto"
+                  variant="secondary"
+                  onClick={() => {
+                    signOut(auth);
+                  }}
+                >
+                  Sign out
+                </Button>
+              )}
             </ul>
           </div>
         )}
