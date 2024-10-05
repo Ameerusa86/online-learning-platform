@@ -15,6 +15,10 @@ const Navlinks = [
     title: "Contact",
     url: "/contact",
   },
+  {
+    title: "Dashboard",
+    url: "/admin/dashboard",
+  },
 ];
 
 export default Navlinks;

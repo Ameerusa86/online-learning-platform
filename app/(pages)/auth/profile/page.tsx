@@ -59,9 +59,11 @@ export default function ProfilePage() {
 
           if (userDoc.exists()) {
             const userData = userDoc.data();
+
+            // Check and set the user's role (e.g., isAdmin) from Firestore
             setProfileState((prevState) => ({
               ...prevState,
-              isAdmin: !!userData.isAdmin,
+              isAdmin: !!userData.isAdmin, // Set the isAdmin value from Firestore
             }));
           }
 
@@ -190,7 +192,6 @@ export default function ProfilePage() {
 
   return (
     <>
-      {/* Add the ToastProvider here */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -205,7 +206,7 @@ export default function ProfilePage() {
           {user && (
             <div className="relative w-24 h-24 rounded-full overflow-hidden">
               <Image
-                src={user.photoURL || "/default-profile.png"}
+                src={user.photoURL || "/public/images/user.png"}
                 alt="Profile"
                 className="object-cover w-full h-full"
                 width={96}

@@ -32,6 +32,7 @@ interface User {
   email: string;
   name: string;
   isAdmin: boolean;
+  photoURL?: string;
 }
 
 const Users: React.FC = () => {
@@ -58,6 +59,7 @@ const Users: React.FC = () => {
           email: doc.data().email,
           name: doc.data().name,
           isAdmin: doc.data().isAdmin,
+          photoURL: doc.data().photoURL,
         }));
         setUsers(fetchedUsers);
       } catch (error) {
@@ -92,7 +94,7 @@ const Users: React.FC = () => {
       await setDoc(doc(firestore, "users", user.uid), {
         email: newUserEmail,
         name: newUserFullName,
-        isAdmin: false,
+        isAdmin: false, // Set default user role to 'User'
         createdAt: new Date(),
       });
 
@@ -102,7 +104,7 @@ const Users: React.FC = () => {
           id: user.uid,
           email: newUserEmail,
           name: newUserFullName,
-          isAdmin: false,
+          isAdmin: false, // Default to false for new users
         },
       ]);
 

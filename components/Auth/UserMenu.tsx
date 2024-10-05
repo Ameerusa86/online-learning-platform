@@ -22,9 +22,11 @@ import { images } from "@/public/images";
 import { Button } from "../ui/button";
 import { signOut } from "firebase/auth";
 import { auth } from "@/utils/firebase";
+import { redirect, useRouter } from "next/navigation";
 
 const UserMenu = () => {
   const user = useAuth(); // Get the authenticated user
+  const router = useRouter();
 
   return (
     <DropdownMenu>
@@ -110,6 +112,7 @@ const UserMenu = () => {
           <Button
             onClick={() => {
               signOut(auth);
+              router.push("/auth/signin");
             }}
           >
             Sign out

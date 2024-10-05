@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { useRouter } from "next/navigation"; // Use router to redirect after logout
+import { redirect, useRouter } from "next/navigation"; // Use router to redirect after logout
 import { useAuth } from "@/app/hooks/useAuth";
 import { images } from "@/public/images";
 import { signOut } from "firebase/auth";
@@ -77,6 +77,7 @@ export const AccountToggle = () => {
                   variant="secondary"
                   onClick={() => {
                     signOut(auth);
+                    router.push("/auth/signin");
                   }}
                 >
                   Sign out

@@ -13,10 +13,12 @@ import { Button } from "../ui/button";
 import { signOut } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 import UserMenu from "../Auth/UserMenu";
+import { useRouter } from "next/navigation";
 
 const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const user = useAuth();
+  const router = useRouter();
 
   const handleOpen = () => {
     setIsOpen(true);
@@ -126,6 +128,7 @@ const MobileNav = () => {
                   variant="secondary"
                   onClick={() => {
                     signOut(auth);
+                    router.push("/auth/signin");
                   }}
                 >
                   Sign out

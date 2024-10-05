@@ -10,17 +10,24 @@ export const useAuth = () => {
     // Subscribe to the authentication state changes
     const unsubscribe = onAuthStateChanged(
       auth,
-      (firebaseUser: FirebaseUser | null) => {
+      async (firebaseUser: FirebaseUser | null) => {
         if (firebaseUser) {
+          // Get the ID token result, which includes custom claims like isAdmin
+          const idTokenResult = await firebaseUser.getIdTokenResult();
+
           // Extract uid, email, displayName, and photoURL from the Firebase user object
           const { uid, email, displayName, photoURL } = firebaseUser;
 
-          // Set the user state with the correct User object
+          // Explicitly cast isAdmin to a boolean (defaulting to false if undefined)
+          const isAdmin = !!idTokenResult.claims.isAdmin;
+
+          // Set the user state with the correct User object, including isAdmin
           setUser({
             uid,
-            name: displayName, // Assign displayName to name
-            email,
+            name: displayName || "Anonymous", // Fallback for name
+            email: email || "No Email", // Fallback for email
             photoURL, // Assign photoURL
+            isAdmin, // Correctly typed boolean
           });
         } else {
           // If no user is authenticated, set the user state to null

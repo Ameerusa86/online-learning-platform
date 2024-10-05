@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import MobileNav from "./MobileNav";
 import Link from "next/link";
@@ -13,6 +13,11 @@ import UserMenu from "../Auth/UserMenu";
 
 const Navbar: React.FC = () => {
   const user = useAuth(); // Get the authenticated user
+
+  // Debugging: Log user object to check if isAdmin is present
+  useEffect(() => {
+    console.log("User:", user);
+  }, [user]);
 
   return (
     <header
@@ -33,12 +38,14 @@ const Navbar: React.FC = () => {
 
         {/* Menu Section */}
         <nav className="hidden lg:flex items-center space-x-10">
-          {Navlinks.map((link, index) => (
+          {/* Filter out "Dashboard" if user is not admin */}
+          {Navlinks.filter(
+            (link) => link.title !== "Dashboard" || user?.isAdmin
+          ).map((link, index) => (
             <Link key={index} href={link.url} className="nav__link">
               {link.title}
             </Link>
           ))}
-          {/* Conditionally add "Dashboard" link for admin users */}
         </nav>
 
         {/* Auth Section */}
