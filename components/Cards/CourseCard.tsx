@@ -10,7 +10,7 @@ interface Course {
   description: string;
   imageUrl: string;
   author: string;
-  price: string | number; // Price can be a string or a number
+  price: string | number;
   category: string;
   chaptersCount: number;
   slug: string;
@@ -31,65 +31,63 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     chaptersCount,
     slug,
   } = course;
+
   const router = useRouter();
 
   const handleNavigate = () => {
-    router.push(`/course/${course.slug}`);
+    router.push(`/course/${slug}`);
   };
 
   // Price logic: Display "Free" if price is 0, otherwise display the price with a dollar sign
-  const displayPrice = price === 0 ? "Free" : `$${price}`;
+  const isFree = price === 0;
+  const displayPrice = isFree ? "Free" : `$${price}`;
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="w-full sm:w-full lg:w-full bg-white rounded-xl overflow-hidden transform transition">
-        <div className="relative">
-          <Image
-            height={400}
-            width={500}
-            className="w-full h-48 sm:h-56 md:h-64 object-cover duration-500 hover:scale-105"
-            src={
-              imageUrl ||
-              "https://via.placeholder.com/800x600.png?text=No+Image+Available"
-            }
-            alt={title}
-          />
-          <div className="absolute top-0 right-0 bg-teal-500 text-white px-2 py-1 m-2 rounded-md text-xs sm:text-sm font-semibold">
-            {category}
-          </div>
-          <div className="absolute top-0 left-0 bg-orange-500 text-white px-2 py-1 m-2 rounded-md text-xs sm:text-sm font-semibold">
-            {displayPrice}
-          </div>
+    <div className="max-w-sm bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl">
+      {/* Image Section */}
+      <div className="relative group">
+        <Image
+          height={250}
+          width={400}
+          className="w-full h-52 object-cover transition-transform duration-300 group-hover:scale-110"
+          src={
+            imageUrl ||
+            "https://via.placeholder.com/800x600.png?text=No+Image+Available"
+          }
+          alt={title}
+        />
+        {/* Price and Category */}
+        <div className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600">
+          {displayPrice}
         </div>
-        <div className="p-4 sm:p-6">
-          <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold mb-2 text-gray-800">
-            {title}
-          </h2>
-          <p className="text-xs sm:text-sm md:text-base text-gray-600 mb-4">
-            {description}
-          </p>
+        <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600">
+          {category}
+        </div>
+      </div>
 
-          <div className="flex flex-col justify-between items-start">
-            {" "}
-            {/* Changed to items-start to align content to the left */}
-            <span className="text-xs sm:text-sm md:text-base text-gray-800 font-semibold text-left">
-              {" "}
-              {/* Added text-left */}
-              Author: {author}
-            </span>
-            <span className="text-xs sm:text-sm mt-2 text-left">
-              {" "}
-              {/* Added text-left */}
-              Chapters: {chaptersCount}
-            </span>
-            <Button
-              className="px-3 mt-4 sm:px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition duration-300 ease-in-out text-xs sm:text-sm md:text-base w-full"
-              onClick={handleNavigate}
-            >
-              Enroll Now
-            </Button>
-          </div>
+      {/* Content Section */}
+      <div className="p-5 flex flex-col justify-between">
+        {/* Title and Description */}
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">{title}</h2>
+          <p className="text-sm text-gray-600 line-clamp-3">{description}</p>
         </div>
+
+        {/* Author and Chapters Section */}
+        <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
+          <span className="font-semibold">By {author}</span>
+          <span className="ml-4">
+            {chaptersCount > 0 ? `${chaptersCount} Chapters` : "No chapters"}
+          </span>
+        </div>
+
+        {/* Enroll Button */}
+        <Button
+          className="w-full bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 py-2 transition duration-300"
+          onClick={handleNavigate}
+        >
+          Enroll Now
+        </Button>
       </div>
     </div>
   );
