@@ -39,8 +39,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   };
 
   // Price logic: Display "Free" if price is 0, otherwise display the price with a dollar sign
-  const isFree = price === 0;
-  const displayPrice = isFree ? "Free" : `$${price}`;
+  const displayPrice = price === "Free" || price === 0 ? "Free" : `$${price}`;
 
   return (
     <div className="max-w-sm bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl">
