@@ -1,16 +1,53 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Menu, X } from "lucide-react";
-import { navLinks } from "@/lib/marketing";
+import { useAuth } from "@/app/hooks/useAuth";
+import { usePathname } from "next/navigation";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user, signOut, loading } = useAuth();
+  const pathname = usePathname();
+
+  // Build links dynamically based on auth + existing pages
+  const isAuthed = !!user;
+  let links: { label: string; href: string }[] = [];
+
+  if (isAuthed) {
+    links = [
+      { label: "Courses", href: "/courses" },
+      { label: "Dashboard", href: "/dashboard" },
+    ];
+    // Example admin heuristic (adjust to your real logic): email contains 'admin'
+    if (user?.email?.includes("admin")) {
+      links.push({ label: "Admin", href: "/admin/courses" });
+    }
+  } else {
+    links = [
+      { label: "Features", href: "#features" },
+      { label: "Courses", href: "/courses" },
+    ];
+  }
+
+  // Only keep the #features link when on landing page
+  if (pathname !== "/") {
+    links = links.filter((l) => l.href !== "#features");
+  }
+
+  const isActive = (href: string) => {
+    if (href.startsWith("#")) return pathname === "/"; // anchor active only on home
+    return pathname === href || pathname.startsWith(href + "/");
+  };
+
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+  }, [signOut]);
 
   // Scroll shadow + frosted background
   useEffect(() => {
@@ -51,11 +88,17 @@ export function Navbar() {
             className="hidden items-center gap-6 md:flex"
             aria-label="Primary"
           >
-            {navLinks.map((l) => (
+            {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
-                className="text-sm text-muted-foreground hover:text-foreground"
+                className={[
+                  "text-sm transition-colors",
+                  isActive(l.href)
+                    ? "text-foreground font-medium"
+                    : "text-muted-foreground hover:text-foreground",
+                ].join(" ")}
+                onClick={() => setOpen(false)}
               >
                 {l.label}
               </Link>
@@ -65,9 +108,26 @@ export function Navbar() {
           {/* Desktop actions */}
           <div className="hidden items-center gap-2 md:flex">
             <ThemeToggle />
-            <Button asChild size="sm">
-              <Link href="/login">Sign in</Link>
-            </Button>
+            {!isAuthed && (
+              <>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/login">Sign in</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/register">Get started</Link>
+                </Button>
+              </>
+            )}
+            {isAuthed && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={loading}
+                onClick={handleSignOut}
+              >
+                {loading ? "..." : "Sign out"}
+              </Button>
+            )}
           </div>
 
           {/* Mobile trigger */}
@@ -85,7 +145,14 @@ export function Navbar() {
       {/* Mobile menu in a portal (full-screen, opaque) */}
       {typeof window !== "undefined" &&
         createPortal(
-          <MobileMenu open={open} onClose={() => setOpen(false)} />,
+          <MobileMenu
+            open={open}
+            onClose={() => setOpen(false)}
+            links={links}
+            isAuthed={isAuthed}
+            onSignOut={handleSignOut}
+            loading={loading}
+          />,
           document.body
         )}
     </>
@@ -94,7 +161,23 @@ export function Navbar() {
 
 /* ------------------------------ MobileMenu ------------------------------ */
 
-function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+interface MobileMenuProps {
+  open: boolean;
+  onClose: () => void;
+  links: { label: string; href: string }[];
+  isAuthed: boolean;
+  onSignOut: () => Promise<void> | void;
+  loading: boolean;
+}
+
+function MobileMenu({
+  open,
+  onClose,
+  links,
+  isAuthed,
+  onSignOut,
+  loading,
+}: MobileMenuProps) {
   // Close on Escape
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -140,7 +223,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
           aria-label="Primary mobile"
           className="mx-auto flex w-full max-w-md flex-col items-stretch gap-4 text-center"
         >
-          {navLinks.map((l) => (
+          {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -159,16 +242,33 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
           © {new Date().getFullYear()} LMS
         </span>
         <div className="flex items-center gap-3">
-          <Button asChild variant="outline" className="h-11 px-5 text-base">
-            <Link href="/login" onClick={onClose}>
-              Sign in
-            </Link>
-          </Button>
-          <Button asChild className="h-11 px-5 text-base">
-            <Link href="/register" onClick={onClose}>
-              Get started
-            </Link>
-          </Button>
+          {!isAuthed && (
+            <>
+              <Button asChild variant="outline" className="h-11 px-5 text-base">
+                <Link href="/login" onClick={onClose}>
+                  Sign in
+                </Link>
+              </Button>
+              <Button asChild className="h-11 px-5 text-base">
+                <Link href="/register" onClick={onClose}>
+                  Get started
+                </Link>
+              </Button>
+            </>
+          )}
+          {isAuthed && (
+            <Button
+              className="h-11 px-5 text-base"
+              variant="outline"
+              disabled={loading}
+              onClick={async () => {
+                await onSignOut();
+                onClose();
+              }}
+            >
+              {loading ? "..." : "Sign out"}
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -77,14 +77,14 @@ export function Hero() {
           {logos.map((logo, i) => (
             <div
               key={i}
-              className="flex h-16 w-48 items-center justify-center rounded-md border border-border/50 bg-muted/60 text-[10px] font-medium uppercase tracking-wide text-muted-foreground hover:opacity-100 hover:grayscale-0"
+              className="flex h-32 w-48 items-center justify-center rounded-md border border-border/50 bg-muted/60 text-[10px] font-medium uppercase tracking-wide text-muted-foreground hover:opacity-100 hover:grayscale-0  object-contain opacity-80 grayscale transition  "
             >
               <Image
                 src={logo.src}
                 alt={logo.alt}
                 width={125}
                 height={125}
-                className="h-12 w-auto object-contain opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
+                className="h-24 w-auto"
               />
             </div>
           ))}

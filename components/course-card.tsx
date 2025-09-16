@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
@@ -168,11 +163,11 @@ export function CourseCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-6 pt-0">
+      <div className="p-6 pt-0">
         <Button asChild className="w-full">
           <Link href={`/courses/${course.slug}`}>View Course</Link>
         </Button>
-      </CardFooter>
+      </div>
     </Card>
   );
 }

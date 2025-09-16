@@ -1,19 +1,18 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Navbar } from "@/components/marketing/navbar";
+import { Footer } from "@/components/marketing/footer";
+import { CoursesClient } from "@/components/courses/courses-client";
 
-// This would typically fetch courses from your API
+// TODO: Replace with real data fetching (e.g. from DB or API route)
 async function getCourses() {
-  // Mock data for now
   return [
     {
       id: "1",
       title: "React Fundamentals",
       description: "Learn the basics of React development from scratch",
       instructor: "John Doe",
-      duration: "8 hours",
-      level: "Beginner",
+      duration: "8h",
+      level: "beginner" as const,
       price: 99,
-      thumbnail: "/placeholder.jpg",
       slug: "react-fundamentals",
     },
     {
@@ -21,10 +20,9 @@ async function getCourses() {
       title: "JavaScript Advanced",
       description: "Master advanced JavaScript concepts and patterns",
       instructor: "Jane Smith",
-      duration: "12 hours",
-      level: "Advanced",
+      duration: "12h",
+      level: "advanced" as const,
       price: 149,
-      thumbnail: "/placeholder.jpg",
       slug: "javascript-advanced",
     },
     {
@@ -32,10 +30,9 @@ async function getCourses() {
       title: "Node.js Backend Development",
       description: "Build scalable backend applications with Node.js",
       instructor: "Mike Johnson",
-      duration: "15 hours",
-      level: "Intermediate",
+      duration: "15h",
+      level: "intermediate" as const,
       price: 129,
-      thumbnail: "/placeholder.jpg",
       slug: "nodejs-backend",
     },
   ];
@@ -43,62 +40,44 @@ async function getCourses() {
 
 export default async function CoursesPage() {
   const courses = await getCourses();
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">All Courses</h1>
-        <p className="text-gray-600">
-          Discover and enroll in courses to advance your skills.
-        </p>
-      </div>
-
-      {/* Filters */}
-      <div className="mb-8">
-        <div className="flex gap-4 flex-wrap">
-          <Button variant="outline" size="sm">
-            All Levels
-          </Button>
-          <Button variant="outline" size="sm">
-            Beginner
-          </Button>
-          <Button variant="outline" size="sm">
-            Intermediate
-          </Button>
-          <Button variant="outline" size="sm">
-            Advanced
-          </Button>
-        </div>
-      </div>
-
-      {/* Course Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
-          <div
-            key={course.id}
-            className="bg-white rounded-lg shadow-sm border overflow-hidden"
-          >
-            <div className="w-full h-48 bg-gray-200"></div>
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-2">
-                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                  {course.level}
-                </span>
-                <span className="font-bold text-lg">${course.price}</span>
-              </div>
-              <h3 className="font-semibold text-lg mb-2">{course.title}</h3>
-              <p className="text-gray-600 text-sm mb-3">{course.description}</p>
-              <div className="flex justify-between items-center text-sm text-gray-500 mb-4">
-                <span>By {course.instructor}</span>
-                <span>{course.duration}</span>
-              </div>
-              <Button asChild className="w-full">
-                <Link href={`/courses/${course.slug}`}>View Course</Link>
-              </Button>
-            </div>
+    <div className="relative flex min-h-screen flex-col bg-gradient-to-b from-background via-background/95 to-background">
+      <Navbar />
+      {/* Hero / heading */}
+      <section className="relative overflow-hidden border-b border-border/60 bg-background/50">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.18),transparent_60%)]" />
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-16 pt-14 md:px-6 md:pb-20 md:pt-20">
+          <div className="max-w-3xl space-y-6">
+            <h1 className="text-balance text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+              Explore our <span className="text-gradient">course catalog</span>
+            </h1>
+            <p className="max-w-prose text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Curated learning paths and expert‑led lessons to accelerate your
+              skills. Filter by level or search to find exactly what you need.
+            </p>
           </div>
-        ))}
-      </div>
+          <div className="flex flex-wrap gap-3 text-xs text-muted-foreground/80">
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-3 py-1">
+              Quality content
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-3 py-1">
+              Practical projects
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-3 py-1">
+              Lifetime access
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-3 py-1">
+              Certificate ready
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Main content */}
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-12 md:px-6 md:py-16">
+        <CoursesClient courses={courses} />
+      </main>
+      <Footer />
     </div>
   );
 }

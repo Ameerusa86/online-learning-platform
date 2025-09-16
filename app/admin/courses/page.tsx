@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Navbar } from "@/components/marketing/navbar";
+import { Footer } from "@/components/marketing/footer";
 
 // Mock data - this would come from your API
 async function getCourses() {
@@ -34,129 +36,131 @@ async function getCourses() {
 export default async function AdminCoursesPage() {
   const courses = await getCourses();
 
+  const statCard = (label: string, value: string | number) => (
+    <div className="rounded-2xl border border-border/60 bg-background/70 p-6 backdrop-blur">
+      <h3 className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </h3>
+      <p className="text-2xl font-bold tracking-tight">{value}</p>
+    </div>
+  );
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Course Management
-          </h1>
-          <p className="text-gray-600">Create and manage your courses.</p>
+    <div className="flex min-h-screen flex-col bg-background">
+      <Navbar />
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 md:px-6 md:py-14">
+        <div className="mb-10 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Course Management
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Create and manage your courses.
+            </p>
+          </div>
+          <Button asChild size="sm" className="h-11 px-6">
+            <Link href="/admin/courses/new">Create New Course</Link>
+          </Button>
         </div>
-        <Button asChild>
-          <Link href="/admin/courses/new">Create New Course</Link>
-        </Button>
-      </div>
 
-      {/* Stats */}
-      <div className="grid md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-sm font-medium text-gray-500 mb-2">
-            Total Courses
-          </h3>
-          <p className="text-2xl font-bold text-gray-900">{courses.length}</p>
+        {/* Stats */}
+        <div className="mb-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {statCard("Total Courses", courses.length)}
+          {statCard(
+            "Published",
+            courses.filter((c) => c.status === "published").length
+          )}
+          {statCard(
+            "Total Enrollments",
+            courses.reduce((sum, c) => sum + c.enrollments, 0)
+          )}
+          {statCard(
+            "Drafts",
+            courses.filter((c) => c.status === "draft").length
+          )}
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Published</h3>
-          <p className="text-2xl font-bold text-gray-900">
-            {courses.filter((c) => c.status === "published").length}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-sm font-medium text-gray-500 mb-2">
-            Total Enrollments
-          </h3>
-          <p className="text-2xl font-bold text-gray-900">
-            {courses.reduce((sum, c) => sum + c.enrollments, 0)}
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Drafts</h3>
-          <p className="text-2xl font-bold text-gray-900">
-            {courses.filter((c) => c.status === "draft").length}
-          </p>
-        </div>
-      </div>
 
-      {/* Courses Table */}
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold">All Courses</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Course
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Enrollments
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Updated
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {courses.map((course) => (
-                <tr key={course.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {course.title}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        ID: {course.id}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        course.status === "published"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {course.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {course.enrollments}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(course.updatedAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <Link
-                      href={`/admin/courses/${course.id}`}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      Edit
-                    </Link>
-                    <Link
-                      href={`/admin/courses/${course.id}/sections`}
-                      className="text-green-600 hover:text-green-900"
-                    >
-                      Sections
-                    </Link>
-                    <button className="text-red-600 hover:text-red-900">
-                      Delete
-                    </button>
-                  </td>
+        {/* Courses Table */}
+        <div className="overflow-hidden rounded-2xl border border-border/60 bg-background/60 backdrop-blur">
+          <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
+            <h2 className="text-lg font-semibold tracking-tight">
+              All Courses
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {courses.length} total
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-6 py-3 text-left font-medium">Course</th>
+                  <th className="px-6 py-3 text-left font-medium">Status</th>
+                  <th className="px-6 py-3 text-left font-medium">
+                    Enrollments
+                  </th>
+                  <th className="px-6 py-3 text-left font-medium">Updated</th>
+                  <th className="px-6 py-3 text-left font-medium">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {courses.map((course) => {
+                  const statusStyles =
+                    course.status === "published"
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      : "bg-amber-500/10 text-amber-600 dark:text-amber-400";
+                  return (
+                    <tr
+                      key={course.id}
+                      className="border-t border-border/60 hover:bg-muted/30"
+                    >
+                      <td className="px-6 py-3 align-top">
+                        <div className="font-medium leading-tight">
+                          {course.title}
+                        </div>
+                        <div className="mt-1 text-[11px] text-muted-foreground">
+                          ID: {course.id}
+                        </div>
+                      </td>
+                      <td className="px-6 py-3 align-top">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium capitalize ${statusStyles}`}
+                        >
+                          {course.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 align-top font-medium">
+                        {course.enrollments}
+                      </td>
+                      <td className="px-6 py-3 align-top text-muted-foreground">
+                        {new Date(course.updatedAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-3 align-top space-x-3">
+                        <Link
+                          href={`/admin/courses/${course.id}`}
+                          className="text-primary hover:underline"
+                        >
+                          Edit
+                        </Link>
+                        <Link
+                          href={`/admin/courses/${course.id}/sections`}
+                          className="text-emerald-600 hover:underline dark:text-emerald-400"
+                        >
+                          Sections
+                        </Link>
+                        <button className="text-destructive hover:underline">
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
