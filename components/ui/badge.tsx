@@ -1,23 +1,36 @@
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
 import { cn } from "@/lib/utils";
-import { HTMLAttributes } from "react";
 
-export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: "default" | "outline" | "glow" | "soft";
+const badgeVariants = cva(
+  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
 }
 
-export function Badge({
-  className,
-  variant = "default",
-  ...props
-}: BadgeProps) {
-  const base =
-    "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium tracking-wide uppercase";
-  const styles: Record<string, string> = {
-    default:
-      "bg-gradient-brand text-primary-foreground border-transparent shadow-sm",
-    outline: "border-border/60 text-muted-foreground",
-    glow: "border-transparent bg-primary/15 text-primary shadow-[0_0_0_1px_hsl(var(--primary)/0.25),0_4px_18px_-4px_hsl(var(--gradient-mid)/0.45)]",
-    soft: "bg-primary/10 text-primary border-primary/20",
-  };
-  return <span className={cn(base, styles[variant], className)} {...props} />;
-}
+export { Badge, badgeVariants };
